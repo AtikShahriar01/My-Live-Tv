@@ -6,6 +6,8 @@
   <title>LiveTV - Stream App</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+  <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
   <style>
     body {
       background-color: #0b0c0f;
@@ -18,6 +20,23 @@
     .custom-scroll::-webkit-scrollbar-thumb {
       background: #1f232b;
       border-radius: 4px;
+    }
+    /* Video.js প্লেয়ারকে আমাদের লেআউটের সাথে ফিট করার জন্য */
+    .video-js {
+      width: 100% !important;
+      height: 100% !important;
+      background-color: #050608;
+    }
+    .vjs-big-play-button {
+      background-color: rgba(57, 255, 20, 0.2) !important;
+      border-color: #39FF14 !important;
+      color: #39FF14 !important;
+      border-radius: 50% !important;
+      width: 2em !important;
+      height: 2em !important;
+      line-height: 2em !important;
+      margin-top: -1em !important;
+      margin-left: -1em !important;
     }
   </style>
 </head>
@@ -45,7 +64,7 @@
       <span id="live-time" class="font-normal text-gray-400 bg-transparent pr-1">3:20 PM</span>
       <span class="bg-[#191b20] text-[#39FF14] px-2.5 py-1 rounded text-[11px] font-medium border border-[#39FF14]/20 flex items-center gap-1.5">
         <span class="w-1.5 h-1.5 bg-[#39FF14] rounded-full animate-pulse"></span>
-        <span id="live-visitors">142</span> watching now
+        <span id="live-visitors">158</span> watching now
       </span>
     </div>
   </header>
@@ -67,42 +86,26 @@
           <button id="fav-btn" class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
             <i data-lucide="heart" id="fav-icon" class="w-4 h-4"></i>
           </button>
-          <button class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
-            <i data-lucide="volume-2" class="w-4 h-4"></i>
-          </button>
-          <button class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
-            <i data-lucide="maximize" class="w-4 h-4"></i>
-          </button>
         </div>
       </div>
 
-      <div class="relative flex-1 bg-[#050608] overflow-hidden group flex items-center justify-center">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 z-10 pointer-events-none"></div>
+      <div class="relative flex-1 bg-[#050608] overflow-hidden flex items-center justify-center">
         
         <div id="channel-list-overlay" class="absolute inset-0 z-30 bg-[#0d0e12]/95 p-6 overflow-y-auto hidden custom-scroll">
           <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Search Results</h3>
           <div id="search-results-grid" class="grid grid-cols-3 gap-3"></div>
         </div>
 
-        <div class="text-center z-0 px-6">
-          <div class="bg-red-600/10 text-red-500 border border-red-500/20 text-xs px-3 py-1.5 rounded-md inline-block font-mono uppercase tracking-widest mb-2">
-            VIVO: LOS ANGELES, CA
-          </div>
-          <h2 id="video-display-title" class="text-xl font-black text-gray-200 uppercase tracking-wide">EE.UU. COMENZÓ CON EL PIE DERECHO EL MUNDIAL</h2>
-          <p id="video-display-host" class="text-xs text-gray-500 font-mono mt-1">Host Source: 181.191.141.7</p>
-        </div>
-
-        <div class="absolute inset-0 flex items-center justify-center space-x-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 bg-black/50">
-          <button class="p-3 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200">
-            <span class="text-xs font-bold flex flex-col items-center"><i data-lucide="rotate-ccw" class="w-5 h-5 mb-0.5"></i>10</span>
-          </button>
-          <button id="main-play-btn" class="p-5 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200 transform scale-110">
-            <i data-lucide="play" class="w-7 h-7 fill-current"></i>
-          </button>
-          <button class="p-3 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200">
-            <span class="text-xs font-bold flex flex-col items-center"><i data-lucide="rotate-cw" class="w-5 h-5 mb-0.5"></i>10</span>
-          </button>
-        </div>
+        <video 
+          id="live-player" 
+          class="video-js vjs-default-skin vjs-big-play-centered" 
+          controls 
+          preload="auto" 
+          muted 
+          autoplay
+        >
+          <source id="player-source" src="https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8" type="application/x-mpegURL">
+        </video>
       </div>
     </section>
 
@@ -152,45 +155,44 @@
   </footer>
 
   <script>
-    // অল চ্যানেল ডাটাবেস
+    // লাইভ ডেমো এবং রিয়েল স্ট্রিম সোর্স লিস্ট (M3U8 HLS Streaming Links)
     const channels = [
-      { id: '1', name: 'ESPN LAT', group: 'ESPN', region: 'Global', host: '181.191.141.7', quality: '720P', logoText: 'EL', title: 'EE.UU. COMENZÓ CON EL PIE DERECHO EL MUNDIAL' },
-      { id: '2', name: 'DAZN 1 Main', group: 'DAZN', region: 'Europe', host: '192.168.1.50', quality: '1080P', logoText: 'DZ', title: 'LIVE: UEFA CHAMPIONS LEAGUE' },
-      { id: '3', name: 'Fox Sports 1', group: 'Sports', region: 'USA', host: '45.12.32.10', quality: '720P', logoText: 'FS', title: 'MLS: L.A. GALAXY VS INTER MIAMI' },
-      { id: '4', name: 'Sky Sports PL', group: 'Sports', region: 'UK', host: '88.41.22.19', quality: '1080P', logoText: 'SS', title: 'PREMIER LEAGUE LIVE' }
+      { id: '1', name: 'ESPN LAT', group: 'ESPN', region: 'Global', host: '181.191.141.7', quality: '720P', logoText: 'EL', url: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8' },
+      { id: '2', name: 'DAZN 1 Main', group: 'DAZN', region: 'Europe', host: '192.168.1.50', quality: '1080P', logoText: 'DZ', url: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8' },
+      { id: '3', name: 'Fox Sports 1', group: 'Sports', region: 'USA', host: '45.12.32.10', quality: '720P', logoText: 'FS', url: 'https://demo.unified-streaming.com/kaltura/video/smil:tears-of-steel.smil/.m3u8' },
+      { id: '4', name: 'Sky Sports PL', group: 'Sports', region: 'UK', host: '88.41.22.19', quality: '1080P', logoText: 'SS', url: 'https://content.jwplatform.com/manifests/vM7nH0Cc.m3u8' }
     ];
 
-    let favorites = []; // ফেভারিট চ্যানেল স্টোর করার জন্য
+    let favorites = [];
     let currentChannel = channels[0];
+    
+    // Video.js প্লেয়ার ইনিশিয়ালাইজ করা
+    const player = videojs('live-player');
 
-    // ১. রিয়েল টাইম ডিজিটাল ঘড়ি
+    // ১. ঘড়ি
     function runLiveClock() {
       const now = new Date();
-      document.getElementById('live-time').innerText = now.toLocaleTimeString('en-US', { 
-        hour: '2-digit', minute: '2-digit', hour12: true 
-      });
+      document.getElementById('live-time').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
     }
     setInterval(runLiveClock, 1000);
     runLiveClock();
 
-    // 🟢 ২. রিয়েল লাইভ ভিজিটর ওঠানামা করার লজিক (রিয়েল লাইভ ফিল)
-    let visitorCount = 142;
+    // ২. রিয়েল লাইভ ভিজিটর ওঠানামা করার লজিক (রিয়েল লাইভ ফিল)
+    let visitorCount = 158;
     function updateLiveVisitors() {
-      // ভিজিটর সংখ্যা র্যান্ডমলি কমবে বা বাড়বে (-৩ থেকে +৫ এর মধ্যে)
-      const change = Math.floor(Math.random() * 9) - 3; 
+      const change = Math.floor(Math.random() * 7) - 3; 
       visitorCount += change;
-      if(visitorCount < 80) visitorCount = 110; // সেফটি লিমিট
       document.getElementById('live-visitors').innerText = visitorCount;
     }
-    setInterval(updateLiveVisitors, 3500); // প্রতি ৩.৫ সেকেন্ডে অটো চেঞ্জ হবে
+    setInterval(updateLiveVisitors, 4000);
 
-    // ⭐️ ৩. ক্যাটাগরি প্যানেল এবং ফেভারিট কাউন্টার আপডেট করা
+    // ৩. ক্যাটাগরি বার রেন্ডার
     const categories = [
-      { name: 'Favorites', count: 0, key: 'fav' },
-      { name: 'Sports', count: 61, key: 'sports' },
-      { name: 'Latino', count: 30, key: 'latino' },
-      { name: 'DAZN', count: 12, key: 'dazn' },
-      { name: 'USA', count: 54, key: 'usa' }
+      { name: 'Favorites', count: 0 },
+      { name: 'Sports', count: 61 },
+      { name: 'Latino', count: 30 },
+      { name: 'DAZN', count: 12 },
+      { name: 'USA', count: 54 }
     ];
 
     function renderCategories() {
@@ -202,17 +204,21 @@
         const isFav = cat.name === 'Favorites';
         const displayCount = isFav ? favorites.length : cat.count;
         
-        btn.className = `px-3 py-1.5 rounded text-[11px] font-bold whitespace-nowrap transition-all duration-150 bg-[#171a21] text-gray-400 hover:bg-[#1f242e] border border-[#232730]`;
-        if(cat.name === 'Sports') {
-          btn.className = `px-3 py-1.5 rounded text-[11px] font-bold whitespace-nowrap transition-all duration-150 bg-[#39FF14] text-black shadow-[0_0_12px_rgba(57,255,20,0.25)]`;
-        }
+        btn.className = `px-3 py-1.5 rounded text-[11px] font-bold whitespace-nowrap transition-all duration-150 ${
+          cat.name === 'Sports' 
+            ? 'bg-[#39FF14] text-black shadow-[0_0_12px_rgba(57,255,20,0.25)]' 
+            : 'bg-[#171a21] text-gray-400 hover:bg-[#1f242e] border border-[#232730]'
+        }`;
         
         btn.innerHTML = `${cat.name} <span class="ml-1 text-[10px] font-medium text-gray-600">${displayCount}</span>`;
         
-        // ফেভারিট ক্যাটাগরিতে ক্লিক করলে ফেভারিট চ্যানেলগুলো শো করার ট্রিপল অ্যাকশন
         if(isFav) {
+          btn.addEventListener('click', () => showSearchResults(favorites, "Your Favorites"));
+        } else {
           btn.addEventListener('click', () => {
-            showSearchResults(favorites, "Your Favorites");
+            // জেনারেল ক্যাটাগরি ক্লিক করলে ওই গ্রুপের চ্যানেল শো করবে
+            const filtered = channels.filter(c => c.group.toLowerCase() === cat.name.toLowerCase() || cat.name === 'Sports');
+            showSearchResults(filtered, cat.name);
           });
         }
         catListContainer.appendChild(btn);
@@ -220,23 +226,23 @@
     }
     renderCategories();
 
-    // ❤️ ৪. ফেভারিট (Heart Button) হ্যান্ডলিং লজিক
+    // ❤️ ৪. ফেভারিট হার্ট বাটন লজিক
     const favBtn = document.getElementById('fav-btn');
     const favIcon = document.getElementById('fav-icon');
 
     favBtn.addEventListener('click', () => {
       const index = favorites.findIndex(c => c.id === currentChannel.id);
       if (index === -1) {
-        favorites.push(currentChannel); // ফেভারিটে যোগ করুন
+        favorites.push(currentChannel);
         favIcon.classList.add('fill-red-500', 'text-red-500');
       } else {
-        favorites.splice(index, 1); // ফেভারিট থেকে বাদ দিন
+        favorites.splice(index, 1);
         favIcon.classList.remove('fill-red-500', 'text-red-500');
       }
-      renderCategories(); // বটম ফেভারিট কাউন্ট আপডেট করুন
+      renderCategories();
     });
 
-    // 🔍 ৫. রিয়েল-টাইম সার্চ লজিক
+    // 🔍 ৫. সার্চ ইনপুট হ্যান্ডলার
     const searchInput = document.getElementById('search-input');
     const overlay = document.getElementById('channel-list-overlay');
     const resultsGrid = document.getElementById('search-results-grid');
@@ -247,9 +253,8 @@
         overlay.classList.add('hidden');
         return;
       }
-      // নাম অথবা গ্রুপ দিয়ে চ্যানেল ফিল্টার
       const filtered = channels.filter(c => c.name.toLowerCase().includes(value) || c.group.toLowerCase().includes(value));
-      showSearchResults(filtered, `Search Results for "${value}"`);
+      showSearchResults(filtered, `Search Results`);
     });
 
     function showSearchResults(channelList, headingText) {
@@ -257,7 +262,7 @@
       resultsGrid.innerHTML = '';
       
       if(channelList.length === 0) {
-        resultsGrid.innerHTML = `<p class="text-xs text-gray-500 col-span-3">No channels found.</p>`;
+        resultsGrid.innerHTML = `<p class="text-xs text-gray-500 col-span-3">No channels available.</p>`;
         return;
       }
 
@@ -280,30 +285,13 @@
       });
     }
 
-    // 📺 ৬. চ্যানেল সিলেক্ট বা সুইচ করার মূল ফাংশন
+    // 📺 ৬. চ্যানেল সিলেক্ট ও লাইভ স্ট্রিম চেঞ্জ লজিক
     function selectChannel(ch) {
       currentChannel = ch;
-      // UI ইনফরমেশন পরিবর্তন
+      
+      // মেটাডাটা আপডেট
       document.getElementById('player-channel-name').innerText = ch.name;
       document.getElementById('player-channel-meta').innerText = `Channel 003 • ${ch.group} • ${ch.quality}`;
-      document.getElementById('video-display-title').innerText = ch.title;
-      document.getElementById('video-display-host').innerText = `Host Source: ${ch.host}`;
       document.getElementById('card-logo').innerText = ch.logoText;
       document.getElementById('card-title').innerText = ch.name;
-      document.getElementById('card-group').innerText = ch.group;
-      document.getElementById('card-region').innerText = ch.region;
-      document.getElementById('card-host').innerText = ch.host;
-
-      // ফেভারিট হার্ট আইকন স্ট্যাটাস চেক
-      if(favorites.some(c => c.id === ch.id)) {
-        favIcon.classList.add('fill-red-500', 'text-red-500');
-      } else {
-        favIcon.classList.remove('fill-red-500', 'text-red-500');
-      }
-    }
-
-    // Lucide আইকন রেন্ডারিং
-    lucide.createIcons();
-  </script>
-</body>
-</html>
+      document.getElementById('card-group').innerText
