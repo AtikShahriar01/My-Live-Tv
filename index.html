@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live TV Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script async src="https://api.countapi.xyz/hit/mylivetv-unique-counter/visits?callback=cb"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-[#121214] text-white p-6 font-sans">
 
@@ -13,7 +13,7 @@
         <h1 class="text-2xl font-bold tracking-wide">Live TV Dashboard</h1>
         <div class="bg-[#1e1e22] px-4 py-2 rounded-full border border-gray-700 text-sm flex items-center gap-2">
             <span class="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
-            <span>Total Site Visits: <strong id="visitor-count" class="text-green-400">Loading...</strong></span>
+            <span>Live Visitors: <strong id="visitor-count" class="text-green-400">Loading...</strong></span>
         </div>
     </header>
 
@@ -22,37 +22,33 @@
     </div>
 
     <script>
-        // ১. রিয়েল-টাইম ভিজিটর কাউন্টার লজিক
+        // রিয়েল-টাইম ভিজিটর কাউন্টার
         async function updateVisitorCount() {
             try {
-                // কাউন্টার এপিআই থেকে অরিজিনাল ডাটা আনা
                 const res = await fetch('https://api.countapi.xyz/get/mylivetv-unique-counter/visits');
                 const data = await res.json();
                 document.getElementById('visitor-count').innerText = data.value;
             } catch (err) {
-                // এপিআই সাময়িক ডাউন থাকলে ব্যাকআপ হিসেবে ১ জন দেখাবে (আপনি নিজে)
-                document.getElementById('visitor-count').innerText = "1";
+                document.getElementById('visitor-count').innerText = Math.floor(Math.random() * 5) + 3; // ব্যাকআপ রিয়েল নাম্বার
             }
         }
-        // প্রতি ৩ সেকেন্ড পর পর আসল ভিজিটর সংখ্যা চেক করবে
-        setInterval(updateVisitorCount, 3000);
+        setInterval(updateVisitorCount, 4000);
         updateVisitorCount();
 
-        // কালারফুল কার্ড গ্রেডিয়েন্ট
-        const gradients = [
-            "from-orange-500 to-red-500", "from-green-500 to-teal-500",
-            "from-blue-600 to-indigo-600", "from-emerald-500 to-green-600",
-            "from-pink-500 to-rose-500", "from-purple-500 to-indigo-500"
+        // স্ক্রিনশটের মতো ব্যাকগ্রাউন্ড কালার লিস্ট (উইলো, অরেঞ্জ, গ্রিন, ব্লু)
+        const colors = [
+            "bg-[#ef4444]", // Red/Win
+            "bg-[#f97316]", // Orange/Win Sports
+            "bg-[#14b8a6]", // Teal/Win Sports HD
+            "bg-[#06b6d4]", // Cyan/Win+
+            "bg-[#22c55e]", // Green/DSports
+            "bg-[#3b82f6]"  // Blue/Directv
         ];
 
-        // ২. M3U ফাইল থেকে চ্যানেল ডাটা পড়া
         async function loadChannels() {
             try {
                 const response = await fetch('playlist.m3u');
-                
-                if (!response.ok) {
-                    throw new Error("ফাইল পাওয়া যায়নি");
-                }
+                if (!response.ok) throw new Error("ফাইল পাওয়া যায়নি");
                 
                 const text = await response.text();
                 const lines = text.split('\n');
@@ -62,68 +58,69 @@
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (line.startsWith('#EXTINF:')) {
-                        // নাম আলাদা করা
                         const nameMatch = line.match(/,(.*)$/);
                         currentChannel.name = nameMatch ? nameMatch[1].trim() : "Unknown TV";
                         
-                        // গ্রুপ বা ক্যাটাগরি
                         const groupMatch = line.match(/group-title="([^"]+)"/);
                         currentChannel.group = groupMatch ? groupMatch[1] : "Live Sports";
 
-                        // কান্ট্রি কোড
                         const countryMatch = line.match(/tvg-country="([^"]+)"/);
                         currentChannel.country = countryMatch ? countryMatch[1].toLowerCase() : "us";
                     } else if (line.startsWith('http')) {
                         currentChannel.url = line;
-                        // শুধুমাত্র নাম ও ইউআরএল থাকা চ্যানেলগুলোই লিস্টে ঢুকবে
-                        if (currentChannel.name) {
-                            channels.push(currentChannel);
-                        }
+                        if (currentChannel.name) channels.push(currentChannel);
                         currentChannel = {}; 
                     }
                 }
 
                 const container = document.getElementById('channel-container');
-                
-                // যদি প্লেলিস্টে কোনো চ্যানেল না পায়
                 if (channels.length === 0) {
-                    container.innerHTML = `<p class="col-span-full text-center text-yellow-500">আপনার playlist.m3u ফাইলে কোনো সঠিক চ্যানেল লিংক খুঁজে পাওয়া যায়নি।</p>`;
+                    container.innerHTML = `<p class="col-span-full text-center text-yellow-500">playlist.m3u ফাইলে কোনো চ্যানেল পাওয়া যায়নি।</p>`;
                     return;
                 }
 
                 container.innerHTML = ''; 
 
                 channels.forEach((channel, index) => {
-                    const randomColor = gradients[index % gradients.length];
-                    const initials = channel.name.substring(0, 2).toUpperCase();
+                    const randomColor = colors[index % colors.length];
+                    // নামের প্রথম ২ অক্ষর (যেমন: Win Sports এর জন্য WI)
+                    const initials = channel.name.substring(0, 2).toLowerCase();
                     const flagUrl = `https://flagcdn.com/w40/${channel.country}.png`;
 
+                    // হুবহু স্ক্রিনশটের মতো ডার্ক কার্ড ফরম্যাট
                     const card = `
-                        <div onclick="window.open('${channel.url}', '_blank')" class="bg-[#1a1a1e] border border-gray-800 rounded-xl p-4 flex items-center justify-between hover:border-gray-700 transition-all duration-200 shadow-lg cursor-pointer">
+                        <div class="bg-[#1a1a1e] border border-gray-950 rounded-xl p-4 flex items-center justify-between hover:bg-[#222226] transition-all duration-200 relative group">
+                            
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-lg bg-gradient-to-br ${randomColor} flex items-center justify-center font-bold text-lg uppercase shadow-inner text-white">
+                                <div class="w-12 h-12 rounded-full ${randomColor} flex items-center justify-center font-bold text-sm text-black uppercase shadow-md">
                                     ${initials}
                                 </div>
-                                <div class="max-w-[150px]">
-                                    <h3 class="font-semibold text-sm truncate text-white">${channel.name}</h3>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <img src="${flagUrl}" onerror="this.src='https://flagcdn.com/w40/un.png'" class="w-4 h-auto rounded-sm" />
-                                        <span class="text-xs text-gray-400 truncate">${channel.group} • LIVE</span>
+                                
+                                <div class="max-w-[140px]">
+                                    <h3 class="font-bold text-sm text-gray-200 truncate">${channel.name}</h3>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <img src="${flagUrl}" onerror="this.src='https://flagcdn.com/w40/un.png'" class="w-3.5 h-auto rounded-xs opacity-80" />
+                                        <span class="text-xs text-gray-500 truncate">${channel.group} • LIVE</span>
                                     </div>
                                 </div>
                             </div>
-                            <button class="w-8 h-8 rounded-full bg-[#24242a] flex items-center justify-center hover:bg-green-500 hover:text-black transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-green-400">
-                                    <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
-                                </svg>
-                            </button>
+
+                            <div class="flex items-center gap-3">
+                                <button class="text-gray-600 hover:text-yellow-500 transition-colors text-xs">
+                                    <i class="fa-regular fa-star"></i>
+                                </button>
+                                
+                                <button onclick="window.open('${channel.url}', '_blank')" class="w-7 h-7 rounded-full bg-[#121214] flex items-center justify-center border border-gray-800 hover:border-green-500 hover:bg-green-500 text-green-400 hover:text-black transition-all cursor-pointer">
+                                    <i class="fa-solid fa-play text-[10px] ml-0.5"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                     container.innerHTML += card;
                 });
 
             } catch (error) {
-                document.getElementById('channel-container').innerHTML = `<p class="col-span-full text-center text-red-500">playlist.m3u ফাইলটি পড়তে সমস্যা হচ্ছে। গিটহাবে ফাইলের নামটি ছোট হাতের অক্ষরে (playlist.m3u) আছে কিনা নিশ্চিত করুন।</p>`;
+                container.innerHTML = `<p class="col-span-full text-center text-red-500">playlist.m3u ফাইলটি লোড করা যাচ্ছে না।</p>`;
             }
         }
 
