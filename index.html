@@ -3,93 +3,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LiveTV - Sports Stream App</title>
+  <title>LiveTV - Sports Stream</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     body {
-      background-color: #09090b;
-      color: #f4f4f5;
+      background-color: #0c0c0e;
+      color: #e4e4e7;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    /* স্ক্রিনশটের মতো ডার্ক গ্লোসি কার্ডের কাস্টম স্টাইল */
+    .custom-card {
+      background: linear-gradient(145deg, #18181b, #111113);
+      border: 1px solid #27272a;
+    }
+    .custom-card:hover {
+      border-color: #3f3f46;
     }
   </style>
 </head>
-<body class="p-6">
+<body class="p-4 sm:p-6">
 
-  <header class="flex justify-between items-center mb-6 border-b border-zinc-800 pb-4">
-    <div class="flex items-center gap-3">
-      <h1 class="text-2xl font-bold tracking-wider text-white">LiveTV <span class="text-xs bg-zinc-800 px-2 py-0.5 rounded text-zinc-400">v2.0</span></h1>
+  <header class="flex justify-between items-center mb-6 max-w-[1400px] mx-auto">
+    <div class="flex items-center gap-2">
+      <h1 class="text-xl font-bold tracking-wider text-white">LiveTV</h1>
+      <span class="text-[10px] bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-400 font-mono font-bold">LOCAL:3002</span>
     </div>
-    <div class="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-md text-xs font-semibold text-green-400">
-      <span class="relative flex h-2 w-2">
+    
+    <div class="flex items-center gap-2 px-2.5 py-1 bg-green-500/10 border border-green-500/20 rounded-md text-[11px] font-bold text-green-400">
+      <span class="relative flex h-1.5 w-1.5">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
       </span>
       <span id="visitor-count">158</span> watching now
     </div>
   </header>
 
-  <section class="mb-8 bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col md:flex-row gap-4">
-    <div class="flex-1 bg-black rounded-lg overflow-hidden aspect-video relative flex items-center justify-center">
+  <section class="max-w-[1400px] mx-auto mb-6 bg-[#111113] p-3 rounded-xl border border-zinc-800 grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="md:col-span-3 bg-black rounded-lg overflow-hidden aspect-video relative flex items-center justify-center border border-zinc-900">
       <video id="video-player" class="w-full h-full" controls autoplay muted></video>
-      <div id="player-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 text-zinc-400">
-        <i class="fa-solid fa-circle-play text-5xl mb-2 text-green-500"></i>
-        <span>Select a channel below to watch</span>
+      <div id="player-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950 text-zinc-500">
+        <i class="fa-solid fa-play-circle text-4xl mb-2 text-zinc-700"></i>
+        <span class="text-xs font-medium tracking-wide">SELECT A CHANNEL TO WATCH LIVE STREAM</span>
       </div>
     </div>
     
-    <div class="w-full md:w-64 flex flex-col justify-between p-2 border-t md:border-t-0 md:border-l border-zinc-800/80">
-      <div>
-        <span class="text-xs font-bold text-green-400 tracking-widest uppercase">SIGNAL SOURCE</span>
-        <h2 id="current-channel-name" class="text-xl font-bold text-white mt-1">No Channel Selected</h2>
-        <p id="current-channel-meta" class="text-xs text-zinc-500 mt-1">—</p>
+    <div class="md:col-span-1 flex flex-col justify-between p-1 font-mono text-xs">
+      <div class="space-y-3">
+        <div>
+          <span class="text-[10px] font-bold text-green-400 tracking-wider block">SIGNAL SOURCE</span>
+          <h2 id="current-channel-name" class="text-base font-bold text-white mt-0.5 tracking-wide">—</h2>
+        </div>
+        <div class="bg-zinc-950/60 p-2.5 rounded-lg border border-zinc-900 space-y-1.5 text-zinc-400 text-[11px]">
+          <div class="flex justify-between"><span>GROUP:</span><span id="current-channel-group" class="text-zinc-200 font-bold">—</span></div>
+          <div class="flex justify-between"><span>REGION:</span><span id="current-channel-region" class="text-zinc-200">—</span></div>
+          <div class="flex justify-between"><span>HOST:</span><span id="current-channel-host" class="text-zinc-300">0.0.0.0</span></div>
+        </div>
       </div>
-      <div class="mt-4 pt-4 border-t border-zinc-800 text-xs text-zinc-400 font-mono space-y-1">
-        <div>HOST: <span id="current-channel-host" class="text-zinc-300">—</span></div>
-        <div>REGION: <span id="current-channel-region" class="text-zinc-300">—</span></div>
+      <div class="mt-4 pt-2 border-t border-zinc-900 flex justify-between text-[11px]">
+        <span class="text-zinc-500">NETSPEED:</span>
+        <span id="current-channel-speed" class="text-green-400 font-bold">0.0 MBps</span>
       </div>
     </div>
   </section>
 
-  <main id="channel-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+  <main id="channel-grid" class="max-w-[1400px] mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
     </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
-    // ১. চ্যানেল লিস্ট (এখানে streamUrl এ আপনার IPTV এর .m3u8 লিংকগুলো বসাবেন)
-    // উদাহরণ হিসেবে কিছু ফ্রি ওয়ার্কিং টেস্ট লিংক দেওয়া হলো
+    // স্ক্রিনশটের সিকোয়েন্স এবং ভেতরের এক্সাক্ট টেক্সট অনুযায়ী ডাটাবেজ
     const channels = [
-      { id: "tyc-latino", name: "TYC Latino", shortName: "TY", category: "Latino", resolution: "LIVE", countryCode: "AR", country: "Argentina", bgThemeColor: "#84cc16", hostIp: "181.191.141.7", speed: "4.2 MBps", isActive: true, streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8" },
-      { id: "dsports-1", name: "DSPORTS 1", shortName: "D1", category: "Sports", resolution: "LIVE", countryCode: "AR", country: "Argentina", bgThemeColor: "#22c55e", hostIp: "190.210.45.12", speed: "5.0 MBps", isActive: true, streamUrl: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8" },
-      { id: "dsports-main", name: "DSports", shortName: "DS", category: "Sports", resolution: "LIVE", countryCode: "ES", country: "Spain", bgThemeColor: "#06b6d4", hostIp: "181.191.141.9", speed: "3.8 MBps", isActive: true, streamUrl: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8" },
-      { id: "espn-lat", name: "ESPN LAT", shortName: "ES", category: "ESPN", resolution: "LIVE", countryCode: "US", country: "United States", bgThemeColor: "#059669", hostIp: "181.191.141.7", speed: "4.0 MBps", isActive: true, streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8" }
+      { id: "win-1", name: "win", shortName: "WI", category: "Live Sports", countryCode: "CO", bgThemeColor: "#f43f5e", hostIp: "186.28.99.1", speed: "4.8 MBps", isActive: true, streamUrl: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8" },
+      { id: "win-sports", name: "Win Sports", shortName: "WS", category: "Latino", countryCode: "CO", bgThemeColor: "#f97316", hostIp: "186.28.99.2", speed: "5.1 MBps", isActive: true, streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8" },
+      { id: "win-sports-latino", name: "WIN SPORTS", shortName: "WS", category: "Latino", countryCode: "CO", bgThemeColor: "#06b6d4", hostIp: "186.28.99.3", speed: "4.2 MBps", isActive: true, streamUrl: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8" },
+      { id: "win-plus", name: "win+", shortName: "WI", category: "Live Sports", countryCode: "CO", bgThemeColor: "#22c55e", hostIp: "186.28.99.4", speed: "3.9 MBps", isActive: true, streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8" },
+      { id: "tyc", name: "TYC", shortName: "TY", category: "Latino", countryCode: "AR", bgThemeColor: "#84cc16", hostIp: "181.191.141.7", speed: "4.5 MBps", isActive: true, streamUrl: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8" },
+      { id: "dsports-1", name: "DSPORTS 1", shortName: "D1", category: "Argentina", countryCode: "AR", bgThemeColor: "#4f46e5", hostIp: "190.210.45.12", speed: "5.0 MBps", isActive: true, streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8" },
+      { id: "dsports-generic", name: "DSports", shortName: "DS", category: "Sports", countryCode: "ES", bgThemeColor: "#0d9488", hostIp: "181.191.141.9", speed: "4.0 MBps", isActive: true, streamUrl: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8" },
+      { id: "espn-premium", name: "espn premium", shortName: "EP", category: "ESPN", countryCode: "US", bgThemeColor: "#ea580c", hostIp: "0.0.0.0", speed: "0.0 MBps", isActive: false, streamUrl: "" }
     ];
 
     let favorites = JSON.parse(localStorage.getItem('tv_favorites')) || [];
 
-    // ২. ভিডিও প্লে করার মেইন ফাংশন
-    function playChannel(url, name, category, resolution, host, region) {
+    // প্লেয়ার ট্রিগার ফাংশন
+    function playChannel(url, name, category, host, country, speed, isActive) {
+      if(!isActive || !url) {
+        alert("This channel is currently inactive or stream URL missing!");
+        return;
+      }
+
       const video = document.getElementById('video-player');
       const placeholder = document.getElementById('player-placeholder');
-      
-      // হাইড প্লেসহোল্ডার
       placeholder.style.display = 'none';
 
-      // প্লেয়ারের সাইডবার ইনফো আপডেট
-      document.getElementById('current-channel-name').innerText = name;
-      document.getElementById('current-channel-meta').innerText = `${category} • ${resolution}`;
+      // আপডেট প্যানেল ডেটা
+      document.getElementById('current-channel-name').innerText = name.toUpperCase();
+      document.getElementById('current-channel-group').innerText = category.toUpperCase();
+      document.getElementById('current-channel-region').innerText = country.toUpperCase();
       document.getElementById('current-channel-host').innerText = host;
-      document.getElementById('current-channel-region').innerText = region;
+      document.getElementById('current-channel-speed').innerText = speed;
 
-      // HLS (m3u8) স্ট্রিমিং লজিক
       if (Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(url);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, function() {
-          video.play();
+          video.play().catch(err => console.log("Autoplay blocked/Error: ", err));
+        });
+        
+        // স্ট্রিম লোড হতে সমস্যা হলে অল্টারনেট হ্যান্ডলিং
+        hls.on(Hls.Events.ERROR, function (event, data) {
+          if (data.fatal) {
+            placeholder.style.display = 'flex';
+            placeholder.querySelector('span').innerText = "STREAM CORRUPT OR CORS BLOCKED";
+          }
         });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // Safari বা iOS ব্রাউজারের নিজস্ব সাপোর্ট
         video.src = url;
         video.addEventListener('loadedmetadata', function() {
           video.play();
@@ -107,61 +137,48 @@
       renderChannels();
     }
 
-    // ৩. গ্রিড রেন্ডার
+    // কার্ড জেনারেশন (স্ক্রিনশটের মতো রাউন্ডেড স্কয়ার আইকন এবং গ্রিন প্লে বাটন লেআউট)
     function renderChannels() {
       const grid = document.getElementById('channel-grid');
       grid.innerHTML = '';
 
-      const sortedChannels = [...channels].sort((a, b) => {
-        const aFav = favorites.includes(a.id) ? 1 : 0;
-        const bFav = favorites.includes(b.id) ? 1 : 0;
-        if (bFav !== aFav) return bFav - aFav;
-        return b.isActive - a.isActive; 
-      });
-
-      sortedChannels.forEach(channel => {
+      channels.forEach(channel => {
         const isFav = favorites.includes(channel.id);
         const card = document.createElement('div');
-        card.className = `relative p-4 rounded-xl transition-all duration-300 border flex flex-col justify-between ${
-          channel.isActive ? 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700' : 'border-red-950/20 bg-zinc-950/40 opacity-40'
+        
+        card.className = `custom-card p-3 rounded-xl flex items-center justify-between transition-all relative ${
+          channel.isActive ? 'opacity-100' : 'opacity-40'
         }`;
 
-        // কার্ডের যেকোনো জায়গায় ক্লিক করলে বা প্লে বাটনে ক্লিক করলে প্লে হবে (যদি একটিভ থাকে)
-        const clickAction = channel.isActive ? `onclick="playChannel('${channel.streamUrl}', '${channel.name}', '${channel.category}', '${channel.resolution}', '${channel.hostIp}', '${channel.country}')"` : '';
-
         card.innerHTML = `
-          <div class="flex justify-between items-center mb-3">
-            <div class="flex items-center gap-2">
-              <img src="https://flagcdn.com/24x18/${channel.countryCode.toLowerCase()}.png" class="rounded-sm shadow-sm">
-              <span class="text-[10px] font-bold text-zinc-400 uppercase">${channel.countryCode}</span>
-            </div>
-            <button onclick="event.stopPropagation(); toggleFavorite('${channel.id}')" class="text-zinc-500 hover:text-yellow-500 transition-colors cursor-pointer">
-              <i class="${isFav ? 'fa-solid fa-star text-yellow-500' : 'fa-regular fa-star'} text-sm"></i>
-            </button>
-          </div>
-
-          <div ${clickAction} class="flex items-center gap-3 my-2 cursor-pointer group">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white text-sm shadow-md shrink-0" style="background-color: ${channel.bgThemeColor};">
+          <div class="flex items-center gap-3 min-w-0">
+            <div 
+              class="w-11 h-11 rounded-lg flex items-center justify-center font-bold text-white text-xs tracking-wider uppercase shrink-0 shadow-inner"
+              style="background-color: ${channel.bgThemeColor};"
+            >
               ${channel.shortName}
             </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="text-sm font-semibold text-zinc-100 truncate group-hover:text-green-400 transition-colors uppercase">${channel.name}</h4>
-              <p class="text-xs text-zinc-500">${channel.category} • ${channel.resolution}</p>
+            <div class="min-w-0">
+              <h4 class="text-xs font-bold text-zinc-100 truncate">${channel.name}</h4>
+              <p class="text-[10px] text-zinc-500 mt-0.5">${channel.category} • LIVE</p>
+              
+              <div class="flex items-center gap-2 mt-1">
+                <img src="https://flagcdn.com/16x12/${channel.countryCode.toLowerCase()}.png" class="rounded-sm opacity-80">
+                <span class="text-[9px] font-mono text-zinc-600">${channel.hostIp}</span>
+              </div>
             </div>
           </div>
 
-          <div class="my-2 p-2 bg-zinc-950/60 rounded-lg flex flex-col gap-1 border border-zinc-800/40 text-[11px] text-zinc-400 font-mono">
-            <div class="flex justify-between items-center"><span>HOST:</span><span class="text-zinc-300">${channel.hostIp}</span></div>
-            <div class="flex justify-between items-center"><span>SPEED:</span><span class="${channel.isActive ? 'text-green-400 font-bold' : 'text-zinc-500'}">${channel.speed}</span></div>
-          </div>
-
-          <div class="mt-2 flex justify-between items-center pt-2 border-t border-zinc-800/60">
-            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium ${channel.isActive ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}">
-              <span class="w-1.5 h-1.5 rounded-full ${channel.isActive ? 'bg-green-500 animate-pulse' : 'bg-red-500'}"></span>
-              ${channel.isActive ? 'Active' : 'Inactive'}
-            </span>
-            <button ${clickAction} class="p-1.5 bg-zinc-800 hover:bg-green-600 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer">
-              <i class="fa-solid fa-play text-[10px] pl-0.5"></i>
+          <div class="flex items-center gap-2.5 shrink-0">
+            <button onclick="toggleFavorite('${channel.id}')" class="text-zinc-600 hover:text-yellow-500 text-xs p-1 transition-colors cursor-pointer">
+              <i class="${isFav ? 'fa-solid fa-star text-yellow-500' : 'fa-regular fa-star'}"></i>
+            </button>
+            
+            <button 
+              onclick="playChannel('${channel.streamUrl}', '${channel.name}', '${channel.category}', '${channel.hostIp}', '${channel.country}', '${channel.speed}', ${channel.isActive})"
+              class="w-7 h-7 bg-zinc-800 hover:bg-green-600 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-all cursor-pointer shadow-md"
+            >
+              <i class="fa-solid fa-play text-[9px] pl-0.5"></i>
             </button>
           </div>
         `;
@@ -169,18 +186,13 @@
       });
     }
 
-    function startVisitorCounter() {
-      const counterEl = document.getElementById('visitor-count');
-      setInterval(() => {
-        let currentCount = parseInt(counterEl.innerText);
-        const change = Math.floor(Math.random() * 5) - 2; 
-        counterEl.innerText = currentCount + change;
-      }, 4000);
-    }
-
     window.onload = () => {
       renderChannels();
-      startVisitorCounter();
+      // অটো-ভিজিটর জেনারেটর
+      setInterval(() => {
+        const el = document.getElementById('visitor-count');
+        el.innerText = parseInt(el.innerText) + (Math.floor(Math.random() * 3) - 1);
+      }, 4000);
     };
   </script>
 </body>
