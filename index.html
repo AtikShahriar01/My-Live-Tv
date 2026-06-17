@@ -3,197 +3,197 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LiveTV - Sports Stream</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>LiveTV - Stream App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    /* স্ক্রিনশটের কাস্টম ডার্ক কালার প্যালেট */
     body {
-      background-color: #0c0c0e;
-      color: #e4e4e7;
-      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #0b0c0f; /* একদম গহীন কালো ব্যাকগ্রাউন্ড */
+      color: #ffffff;
     }
-    /* স্ক্রিনশটের মতো ডার্ক গ্লোসি কার্ডের কাস্টম স্টাইল */
-    .custom-card {
-      background: linear-gradient(145deg, #18181b, #111113);
-      border: 1px solid #27272a;
+    /* হরিজন্টাল স্ক্রোলবারের কাস্টম ডিজাইন যেন স্ক্রিনশটের মতো মসৃণ হয় */
+    .custom-scroll::-webkit-scrollbar {
+      height: 3px;
     }
-    .custom-card:hover {
-      border-color: #3f3f46;
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #1f232b;
+      border-radius: 4px;
     }
   </style>
 </head>
-<body class="p-4 sm:p-6">
+<body class="min-h-screen flex flex-col font-sans select-none overflow-hidden">
 
-  <header class="flex justify-between items-center mb-6 max-w-[1400px] mx-auto">
-    <div class="flex items-center gap-2">
-      <h1 class="text-xl font-bold tracking-wider text-white">LiveTV</h1>
-      <span class="text-[10px] bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-400 font-mono font-bold">LOCAL:3002</span>
+  <header class="flex justify-between items-center px-6 py-3 bg-[#111317] border-b border-[#1b1e24]">
+    <div class="flex items-center space-x-2.5">
+      <i data-lucide="tv" class="w-5 h-5 text-gray-400"></i>
+      <span class="text-base font-bold tracking-normal text-gray-200">LiveTV</span>
     </div>
     
-    <div class="flex items-center gap-2 px-2.5 py-1 bg-green-500/10 border border-green-500/20 rounded-md text-[11px] font-bold text-green-400">
-      <span class="relative flex h-1.5 w-1.5">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+    <div class="flex items-center space-x-3 text-xs text-gray-400">
+      <span id="live-time" class="font-normal text-gray-400 bg-transparent pr-1">3:20 PM</span>
+      <span class="bg-[#191b20] text-gray-400 px-2.5 py-1 rounded text-[11px] font-medium border border-[#23272e]">
+        223 channels
       </span>
-      <span id="visitor-count">158</span> watching now
     </div>
   </header>
 
-  <section class="max-w-[1400px] mx-auto mb-6 bg-[#111113] p-3 rounded-xl border border-zinc-800 grid grid-cols-1 md:grid-cols-4 gap-4">
-    <div class="md:col-span-3 bg-black rounded-lg overflow-hidden aspect-video relative flex items-center justify-center border border-zinc-900">
-      <video id="video-player" class="w-full h-full" controls autoplay muted></video>
-      <div id="player-placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950 text-zinc-500">
-        <i class="fa-solid fa-play-circle text-4xl mb-2 text-zinc-700"></i>
-        <span class="text-xs font-medium tracking-wide">SELECT A CHANNEL TO WATCH LIVE STREAM</span>
-      </div>
-    </div>
+  <main class="flex-1 grid grid-cols-12 gap-5 p-5 bg-[#0b0c0f]">
     
-    <div class="md:col-span-1 flex flex-col justify-between p-1 font-mono text-xs">
-      <div class="space-y-3">
+    <section class="col-span-9 flex flex-col bg-[#111317] rounded-xl border border-[#1b1e24] overflow-hidden">
+      <div class="flex justify-between items-center px-4 py-3 bg-[#13161c]/50 border-b border-[#1b1e24]/70">
+        <div class="flex items-center space-x-3">
+          <span class="text-[9px] font-bold tracking-wider text-[#39FF14] bg-[#39FF14]/10 px-1.5 py-0.5 rounded uppercase flex items-center gap-1 border border-[#39FF14]/20">
+            LIVE NOW
+          </span>
+          <div class="flex flex-col">
+            <h1 class="text-lg font-bold text-white tracking-wide">ESPN LAT</h1>
+            <p class="text-[10px] text-gray-500 mt-0.5">Channel 003 • ESPN • 720P</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
+            <i data-lucide="heart" class="w-4 h-4"></i>
+          </button>
+          <button class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
+            <i data-lucide="volume-2" class="w-4 h-4"></i>
+          </button>
+          <button class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
+            <i data-lucide="maximize" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="relative flex-1 bg-[#050608] overflow-hidden group flex items-center justify-center">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 z-10 pointer-events-none"></div>
+        
+        <div class="text-center z-0 px-6">
+          <div class="bg-red-600/10 text-red-500 border border-red-500/20 text-xs px-3 py-1.5 rounded-md inline-block font-mono uppercase tracking-widest mb-2">
+            VIVO: LOS ANGELES, CA
+          </div>
+          <h2 class="text-xl font-black text-gray-200 uppercase tracking-wide">EE.UU. COMENZÓ CON EL PIE DERECHO EL MUNDIAL</h2>
+          <p class="text-xs text-gray-500 font-mono mt-1">Host Source: 181.191.141.7</p>
+        </div>
+
+        <div class="absolute inset-0 flex items-center justify-center space-x-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 bg-black/50">
+          <button class="p-3 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200">
+            <span class="text-xs font-bold flex flex-col items-center"><i data-lucide="rotate-ccw" class="w-5 h-5 mb-0.5"></i>10</span>
+          </button>
+          <button id="main-play-btn" class="p-5 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200 transform scale-110">
+            <i data-lucide="play" class="w-7 h-7 fill-current"></i>
+          </button>
+          <button class="p-3 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200">
+            <span class="text-xs font-bold flex flex-col items-center"><i data-lucide="rotate-cw" class="w-5 h-5 mb-0.5"></i>10</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="col-span-3 bg-[#111317] rounded-xl border border-[#1b1e24] p-5 flex flex-col justify-between">
+      <div class="space-y-6">
+        <div class="w-16 h-16 bg-[#163a1a] border border-[#39FF14] rounded-xl flex items-center justify-center text-[#39FF14] text-2xl font-black tracking-tighter shadow-[0_0_20px_rgba(57,255,20,0.15)]">
+          EL
+        </div>
+
         <div>
-          <span class="text-[10px] font-bold text-green-400 tracking-wider block">SIGNAL SOURCE</span>
-          <h2 id="current-channel-name" class="text-base font-bold text-white mt-0.5 tracking-wide">—</h2>
+          <p class="text-[9px] text-[#39FF14] font-bold tracking-widest uppercase opacity-80">SIGNAL SOURCE</p>
+          <h2 class="text-xl font-extrabold mt-0.5 text-white tracking-wide">ESPN LAT</h2>
         </div>
-        <div class="bg-zinc-950/60 p-2.5 rounded-lg border border-zinc-900 space-y-1.5 text-zinc-400 text-[11px]">
-          <div class="flex justify-between"><span>GROUP:</span><span id="current-channel-group" class="text-zinc-200 font-bold">—</span></div>
-          <div class="flex justify-between"><span>REGION:</span><span id="current-channel-region" class="text-zinc-200">—</span></div>
-          <div class="flex justify-between"><span>HOST:</span><span id="current-channel-host" class="text-zinc-300">0.0.0.0</span></div>
+
+        <div class="space-y-4 border-t border-[#1b1e24] pt-4 text-xs">
+          <div class="flex flex-col">
+            <span class="text-gray-500 text-[10px] font-semibold uppercase tracking-wider">Group</span>
+            <span class="text-gray-300 font-semibold mt-0.5">ESPN</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-gray-500 text-[10px] font-semibold uppercase tracking-wider">Region</span>
+            <span class="text-gray-300 font-semibold mt-0.5">Global</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-gray-500 text-[10px] font-semibold uppercase tracking-wider">Host</span>
+            <span class="text-mono text-gray-400 font-medium mt-0.5">181.191.141.7</span>
+          </div>
         </div>
       </div>
-      <div class="mt-4 pt-2 border-t border-zinc-900 flex justify-between text-[11px]">
-        <span class="text-zinc-500">NETSPEED:</span>
-        <span id="current-channel-speed" class="text-green-400 font-bold">0.0 MBps</span>
+    </section>
+  </main>
+
+  <footer class="bg-[#111317] border-t border-[#1b1e24] p-4 flex flex-col space-y-3">
+    <div id="cat-list" class="flex items-center space-x-2.5 overflow-x-auto pb-1 custom-scroll">
       </div>
+
+    <div class="flex justify-end space-x-2 pt-1.5 border-t border-[#1b1e24]/40">
+      <button class="flex items-center space-x-1.5 bg-[#171a21] hover:bg-[#1f242e] text-gray-400 hover:text-white px-3.5 py-1.5 rounded text-[11px] font-medium border border-[#232730] transition">
+        <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+        <span>Browse</span>
+      </button>
+      <button class="flex items-center space-x-1.5 bg-[#171a21] hover:bg-[#1f242e] text-gray-400 hover:text-white px-3.5 py-1.5 rounded text-[11px] font-medium border border-[#232730] transition">
+        <i data-lucide="grid" class="w-3.5 h-3.5"></i>
+        <span>Guide</span>
+      </button>
     </div>
-  </section>
+  </footer>
 
-  <main id="channel-grid" class="max-w-[1400px] mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-    </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
-    // স্ক্রিনশটের সিকোয়েন্স এবং ভেতরের এক্সাক্ট টেক্সট অনুযায়ী ডাটাবেজ
-    const channels = [
-      { id: "win-1", name: "win", shortName: "WI", category: "Live Sports", countryCode: "CO", bgThemeColor: "#f43f5e", hostIp: "186.28.99.1", speed: "4.8 MBps", isActive: true, streamUrl: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8" },
-      { id: "win-sports", name: "Win Sports", shortName: "WS", category: "Latino", countryCode: "CO", bgThemeColor: "#f97316", hostIp: "186.28.99.2", speed: "5.1 MBps", isActive: true, streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8" },
-      { id: "win-sports-latino", name: "WIN SPORTS", shortName: "WS", category: "Latino", countryCode: "CO", bgThemeColor: "#06b6d4", hostIp: "186.28.99.3", speed: "4.2 MBps", isActive: true, streamUrl: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8" },
-      { id: "win-plus", name: "win+", shortName: "WI", category: "Live Sports", countryCode: "CO", bgThemeColor: "#22c55e", hostIp: "186.28.99.4", speed: "3.9 MBps", isActive: true, streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8" },
-      { id: "tyc", name: "TYC", shortName: "TY", category: "Latino", countryCode: "AR", bgThemeColor: "#84cc16", hostIp: "181.191.141.7", speed: "4.5 MBps", isActive: true, streamUrl: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8" },
-      { id: "dsports-1", name: "DSPORTS 1", shortName: "D1", category: "Argentina", countryCode: "AR", bgThemeColor: "#4f46e5", hostIp: "190.210.45.12", speed: "5.0 MBps", isActive: true, streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8" },
-      { id: "dsports-generic", name: "DSports", shortName: "DS", category: "Sports", countryCode: "ES", bgThemeColor: "#0d9488", hostIp: "181.191.141.9", speed: "4.0 MBps", isActive: true, streamUrl: "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8" },
-      { id: "espn-premium", name: "espn premium", shortName: "EP", category: "ESPN", countryCode: "US", bgThemeColor: "#ea580c", hostIp: "0.0.0.0", speed: "0.0 MBps", isActive: false, streamUrl: "" }
+    // ক্যাটাগরি ডাটা লুপ
+    const categories = [
+      { name: 'Favorites', count: 0 },
+      { name: 'Sports', count: 61 },
+      { name: 'Latino', count: 30 },
+      { name: 'Live Sports', count: 25 },
+      { name: 'Eastern Europe', count: 31 },
+      { name: 'beIN', count: 12 },
+      { name: 'DAZN', count: 12 },
+      { name: 'Argentina', count: 10 },
+      { name: 'Fox', count: 8 },
+      { name: 'Mexico', count: 5 },
+      { name: 'USA', count: 54 },
+      { name: 'Sky', count: 3 }
     ];
 
-    let favorites = JSON.parse(localStorage.getItem('tv_favorites')) || [];
+    let activeCat = 'Sports'; // SS অনুযায়ী স্পোর্টস একটিভ থাকবে
 
-    // প্লেয়ার ট্রিগার ফাংশন
-    function playChannel(url, name, category, host, country, speed, isActive) {
-      if(!isActive || !url) {
-        alert("This channel is currently inactive or stream URL missing!");
-        return;
-      }
+    // ১. বটম ক্যাটাগরি পিল তৈরি করা
+    const catListContainer = document.getElementById('cat-list');
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      const isActive = cat.name === activeCat;
+      
+      btn.className = `px-3 py-1.5 rounded text-[11px] font-bold whitespace-nowrap transition-all duration-150 ${
+        isActive 
+          ? 'bg-[#39FF14] text-black shadow-[0_0_12px_rgba(57,255,20,0.25)]' 
+          : 'bg-[#171a21] text-gray-400 hover:bg-[#1f242e] hover:text-gray-200 border border-[#232730]'
+      }`;
+      
+      btn.innerHTML = `${cat.name} <span class="ml-1 text-[10px] font-medium ${isActive ? 'text-black/60' : 'text-gray-600'}">${cat.count}</span>`;
+      catListContainer.appendChild(btn);
+    });
 
-      const video = document.getElementById('video-player');
-      const placeholder = document.getElementById('player-placeholder');
-      placeholder.style.display = 'none';
-
-      // আপডেট প্যানেল ডেটা
-      document.getElementById('current-channel-name').innerText = name.toUpperCase();
-      document.getElementById('current-channel-group').innerText = category.toUpperCase();
-      document.getElementById('current-channel-region').innerText = country.toUpperCase();
-      document.getElementById('current-channel-host').innerText = host;
-      document.getElementById('current-channel-speed').innerText = speed;
-
-      if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
-          video.play().catch(err => console.log("Autoplay blocked/Error: ", err));
-        });
-        
-        // স্ট্রিম লোড হতে সমস্যা হলে অল্টারনেট হ্যান্ডলিং
-        hls.on(Hls.Events.ERROR, function (event, data) {
-          if (data.fatal) {
-            placeholder.style.display = 'flex';
-            placeholder.querySelector('span').innerText = "STREAM CORRUPT OR CORS BLOCKED";
-          }
-        });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url;
-        video.addEventListener('loadedmetadata', function() {
-          video.play();
-        });
-      }
-    }
-
-    function toggleFavorite(id) {
-      if (favorites.includes(id)) {
-        favorites = favorites.filter(favId => favId !== id);
-      } else {
-        favorites.push(id);
-      }
-      localStorage.setItem('tv_favorites', JSON.stringify(favorites));
-      renderChannels();
-    }
-
-    // কার্ড জেনারেশন (স্ক্রিনশটের মতো রাউন্ডেড স্কয়ার আইকন এবং গ্রিন প্লে বাটন লেআউট)
-    function renderChannels() {
-      const grid = document.getElementById('channel-grid');
-      grid.innerHTML = '';
-
-      channels.forEach(channel => {
-        const isFav = favorites.includes(channel.id);
-        const card = document.createElement('div');
-        
-        card.className = `custom-card p-3 rounded-xl flex items-center justify-between transition-all relative ${
-          channel.isActive ? 'opacity-100' : 'opacity-40'
-        }`;
-
-        card.innerHTML = `
-          <div class="flex items-center gap-3 min-w-0">
-            <div 
-              class="w-11 h-11 rounded-lg flex items-center justify-center font-bold text-white text-xs tracking-wider uppercase shrink-0 shadow-inner"
-              style="background-color: ${channel.bgThemeColor};"
-            >
-              ${channel.shortName}
-            </div>
-            <div class="min-w-0">
-              <h4 class="text-xs font-bold text-zinc-100 truncate">${channel.name}</h4>
-              <p class="text-[10px] text-zinc-500 mt-0.5">${channel.category} • LIVE</p>
-              
-              <div class="flex items-center gap-2 mt-1">
-                <img src="https://flagcdn.com/16x12/${channel.countryCode.toLowerCase()}.png" class="rounded-sm opacity-80">
-                <span class="text-[9px] font-mono text-zinc-600">${channel.hostIp}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-2.5 shrink-0">
-            <button onclick="toggleFavorite('${channel.id}')" class="text-zinc-600 hover:text-yellow-500 text-xs p-1 transition-colors cursor-pointer">
-              <i class="${isFav ? 'fa-solid fa-star text-yellow-500' : 'fa-regular fa-star'}"></i>
-            </button>
-            
-            <button 
-              onclick="playChannel('${channel.streamUrl}', '${channel.name}', '${channel.category}', '${channel.hostIp}', '${channel.country}', '${channel.speed}', ${channel.isActive})"
-              class="w-7 h-7 bg-zinc-800 hover:bg-green-600 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-all cursor-pointer shadow-md"
-            >
-              <i class="fa-solid fa-play text-[9px] pl-0.5"></i>
-            </button>
-          </div>
-        `;
-        grid.appendChild(card);
+    // ২. রিয়েল টাইম ডিজিটাল ঘড়ি (3:20 PM ফরম্যাট)
+    function runLiveClock() {
+      const now = new Date();
+      document.getElementById('live-time').innerText = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true 
       });
     }
+    setInterval(runLiveClock, 1000);
+    runLiveClock();
 
-    window.onload = () => {
-      renderChannels();
-      // অটো-ভিজিটর জেনারেটর
-      setInterval(() => {
-        const el = document.getElementById('visitor-count');
-        el.innerText = parseInt(el.innerText) + (Math.floor(Math.random() * 3) - 1);
-      }, 4000);
-    };
+    // ৩. প্লে/পজ বাটনের আইকন পরিবর্তন লজিক
+    let streamPlaying = false;
+    const playBtn = document.getElementById('main-play-btn');
+    playBtn.addEventListener('click', () => {
+      streamPlaying = !streamPlaying;
+      playBtn.innerHTML = streamPlaying 
+        ? '<i data-lucide="pause" class="w-7 h-7 fill-current"></i>' 
+        : '<i data-lucide="play" class="w-7 h-7 fill-current"></i>';
+      lucide.createIcons(); // আইকন রি-রেন্ডার
+    });
+
+    // Lucide আইকন অ্যাক্টিভেশন
+    lucide.createIcons();
   </script>
 </body>
 </html>
