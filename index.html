@@ -3,127 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LiveTV Web Application</title>
+  <title>LiveTV - Stream App</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* কাস্টম স্ক্রোলবার এবং ডার্ক থিম স্মুথনেস */
     body {
-      background-color: #0d0e12;
-      color: white;
+      background-color: #0b0c0f;
+      color: #ffffff;
     }
-    .custom-scrollbar::-webkit-scrollbar {
-      height: 4px;
+    .custom-scroll::-webkit-scrollbar {
+      height: 3px;
+      width: 3px;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
+    .custom-scroll::-webkit-scrollbar-thumb {
       background: #1f232b;
-      border-radius: 10px;
+      border-radius: 4px;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans select-none">
+<body class="min-h-screen flex flex-col font-sans select-none overflow-hidden">
 
-  <header class="flex justify-between items-center px-6 py-4 bg-[#13151a] border-b border-[#1f232b]">
-    <div class="flex items-center space-x-2">
-      <i data-lucide="radio" class="w-6 h-6 text-[#39FF14] animate-pulse"></i>
-      <span class="text-xl font-bold tracking-wide">LiveTV</span>
+  <header class="flex justify-between items-center px-6 py-3 bg-[#111317] border-b border-[#1b1e24]">
+    <div class="flex items-center space-x-2.5">
+      <i data-lucide="tv" class="w-5 h-5 text-gray-400"></i>
+      <span class="text-base font-bold tracking-normal text-gray-200">LiveTV</span>
+    </div>
+
+    <div class="relative w-80">
+      <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+        <i data-lucide="search" class="w-4 h-4"></i>
+      </span>
+      <input 
+        type="text" 
+        id="search-input" 
+        placeholder="Search channels..." 
+        class="w-full bg-[#171a21] text-xs text-gray-200 pl-9 pr-4 py-2 rounded border border-[#232730] focus:outline-none focus:border-[#39FF14] transition-all"
+      >
     </div>
     
-    <div class="flex items-center space-x-4 text-sm text-gray-400">
-      <div class="flex items-center space-x-1 bg-[#1a1d24] px-3 py-1.5 rounded-md">
-        <i data-lucide="clock" class="w-4 h-4 text-gray-400"></i>
-        <span id="live-time" class="font-mono text-white">00:00:00 PM</span>
-      </div>
-      <span class="bg-[#1a1d24] text-[#39FF14] px-3 py-1.5 rounded-md font-medium border border-[#39FF14]/20">
-        223 channels
+    <div class="flex items-center space-x-3 text-xs text-gray-400">
+      <span id="live-time" class="font-normal text-gray-400 bg-transparent pr-1">3:20 PM</span>
+      <span class="bg-[#191b20] text-[#39FF14] px-2.5 py-1 rounded text-[11px] font-medium border border-[#39FF14]/20 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 bg-[#39FF14] rounded-full animate-pulse"></span>
+        <span id="live-visitors">142</span> watching now
       </span>
     </div>
   </header>
 
-  <main class="flex-1 grid grid-cols-12 gap-4 p-4 overflow-hidden">
+  <main class="flex-1 grid grid-cols-12 gap-5 p-5 bg-[#0b0c0f]">
     
-    <section class="col-span-9 flex flex-col space-y-2">
-      <div class="flex items-center space-x-3 bg-[#13151a] p-3 rounded-t-lg border-t border-x border-[#1f232b]">
-        <span class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded flex items-center gap-1">
-          <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> LIVE NOW
-        </span>
-        <h1 id="player-channel-name" class="text-lg font-bold text-white">ESPN LAT</h1>
-        <span class="text-xs text-gray-400">Channel 003</span>
-        <span id="player-channel-quality" class="text-xs bg-[#1a1d24] px-2 py-0.5 rounded text-gray-300 border border-gray-700">720P</span>
+    <section class="col-span-9 flex flex-col bg-[#111317] rounded-xl border border-[#1b1e24] overflow-hidden">
+      <div class="flex justify-between items-center px-4 py-3 bg-[#13161c]/50 border-b border-[#1b1e24]/70">
+        <div class="flex items-center space-x-3">
+          <span class="text-[9px] font-bold tracking-wider text-[#39FF14] bg-[#39FF14]/10 px-1.5 py-0.5 rounded uppercase flex items-center gap-1 border border-[#39FF14]/20">
+            LIVE NOW
+          </span>
+          <div class="flex flex-col">
+            <h1 id="player-channel-name" class="text-lg font-bold text-white tracking-wide">ESPN LAT</h1>
+            <p id="player-channel-meta" class="text-[10px] text-gray-500 mt-0.5">Channel 003 • ESPN • 720P</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button id="fav-btn" class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
+            <i data-lucide="heart" id="fav-icon" class="w-4 h-4"></i>
+          </button>
+          <button class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
+            <i data-lucide="volume-2" class="w-4 h-4"></i>
+          </button>
+          <button class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
+            <i data-lucide="maximize" class="w-4 h-4"></i>
+          </button>
+        </div>
       </div>
 
-      <div class="relative flex-1 bg-black rounded-b-lg overflow-hidden group border-b border-x border-[#1f232b] flex items-center justify-center">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 z-10"></div>
+      <div class="relative flex-1 bg-[#050608] overflow-hidden group flex items-center justify-center">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 z-10 pointer-events-none"></div>
         
-        <div class="text-center z-0 text-gray-600">
-          <p class="text-xl font-semibold mb-2">Streaming Stream...</p>
-          <p id="player-channel-url" class="text-xs font-mono text-gray-500">https://demo.unified-streaming.com/.../tears-of-steel.m3u8</p>
+        <div id="channel-list-overlay" class="absolute inset-0 z-30 bg-[#0d0e12]/95 p-6 overflow-y-auto hidden custom-scroll">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Search Results</h3>
+          <div id="search-results-grid" class="grid grid-cols-3 gap-3"></div>
         </div>
 
-        <div class="absolute inset-0 flex items-center justify-center space-x-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 bg-black/40">
-          <button class="p-3 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition">
-            <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
-          </button>
-          <button id="play-pause-btn" class="p-5 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition transform scale-110">
-            <i data-lucide="pause" class="w-8 h-8"></i>
-          </button>
-          <button class="p-3 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition">
-            <i data-lucide="rotate-cw" class="w-6 h-6"></i>
-          </button>
+        <div class="text-center z-0 px-6">
+          <div class="bg-red-600/10 text-red-500 border border-red-500/20 text-xs px-3 py-1.5 rounded-md inline-block font-mono uppercase tracking-widest mb-2">
+            VIVO: LOS ANGELES, CA
+          </div>
+          <h2 id="video-display-title" class="text-xl font-black text-gray-200 uppercase tracking-wide">EE.UU. COMENZÓ CON EL PIE DERECHO EL MUNDIAL</h2>
+          <p id="video-display-host" class="text-xs text-gray-500 font-mono mt-1">Host Source: 181.191.141.7</p>
         </div>
 
-        <div class="absolute bottom-0 inset-x-0 p-4 flex justify-between items-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div class="flex items-center space-x-4">
-            <i data-lucide="volume-2" class="w-5 h-5 text-white hover:text-[#39FF14] cursor-pointer"></i>
-            <div class="w-24 h-1 bg-gray-600 rounded-full overflow-hidden">
-              <div class="w-3/4 h-full bg-[#39FF14]"></div>
-            </div>
-          </div>
-          <div class="flex items-center space-x-4">
-            <i data-lucide="settings" class="w-5 h-5 text-white hover:text-[#39FF14] cursor-pointer"></i>
-            <i data-lucide="maximize" class="w-5 h-5 text-white hover:text-[#39FF14] cursor-pointer"></i>
-          </div>
+        <div class="absolute inset-0 flex items-center justify-center space-x-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 bg-black/50">
+          <button class="p-3 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200">
+            <span class="text-xs font-bold flex flex-col items-center"><i data-lucide="rotate-ccw" class="w-5 h-5 mb-0.5"></i>10</span>
+          </button>
+          <button id="main-play-btn" class="p-5 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200 transform scale-110">
+            <i data-lucide="play" class="w-7 h-7 fill-current"></i>
+          </button>
+          <button class="p-3 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200">
+            <span class="text-xs font-bold flex flex-col items-center"><i data-lucide="rotate-cw" class="w-5 h-5 mb-0.5"></i>10</span>
+          </button>
         </div>
       </div>
     </section>
 
-    <section class="col-span-3 bg-[#13151a] rounded-lg border border-[#1f232b] p-5 flex flex-col space-y-6">
-      <div id="card-logo-text" class="w-24 h-24 bg-[#22ff22]/20 border border-[#39FF14] rounded-xl flex items-center justify-center text-[#39FF14] text-3xl font-black shadow-[0_0_15px_rgba(57,255,20,0.2)]">
-        EL
-      </div>
-
-      <div>
-        <p class="text-xs text-[#39FF14] font-bold tracking-widest uppercase">🔵 Signal Source</p>
-        <h2 id="card-channel-name" class="text-2xl font-black mt-1 text-white tracking-wide">ESPN LAT</h2>
-      </div>
-
-      <div class="flex-1 space-y-4 border-t border-[#1f232b] pt-4 text-sm">
-        <div class="flex flex-col">
-          <span class="text-gray-500 text-xs font-semibold uppercase">Group</span>
-          <span id="card-group" class="text-gray-200 font-medium mt-0.5">ESPN</span>
+    <section class="col-span-3 bg-[#111317] rounded-xl border border-[#1b1e24] p-5 flex flex-col justify-between">
+      <div class="space-y-6">
+        <div id="card-logo" class="w-16 h-16 bg-[#163a1a] border border-[#39FF14] rounded-xl flex items-center justify-center text-[#39FF14] text-2xl font-black tracking-tighter shadow-[0_0_20px_rgba(57,255,20,0.15)]">
+          EL
         </div>
-        <div class="flex flex-col">
-          <span class="text-gray-500 text-xs font-semibold uppercase">Region</span>
-          <span id="card-region" class="text-gray-200 font-medium mt-0.5">Global</span>
+
+        <div>
+          <p class="text-[9px] text-[#39FF14] font-bold tracking-widest uppercase opacity-80">SIGNAL SOURCE</p>
+          <h2 id="card-title" class="text-xl font-extrabold mt-0.5 text-white tracking-wide">ESPN LAT</h2>
         </div>
-        <div class="flex flex-col">
-          <span class="text-gray-500 text-xs font-semibold uppercase">Host</span>
-          <span id="card-host" class="text-mono text-gray-300 font-medium mt-0.5">181.191.141.7</span>
+
+        <div class="space-y-4 border-t border-[#1b1e24] pt-4 text-xs">
+          <div class="flex flex-col">
+            <span class="text-gray-500 text-[10px] font-semibold uppercase tracking-wider">Group</span>
+            <span id="card-group" class="text-gray-300 font-semibold mt-0.5">ESPN</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-gray-500 text-[10px] font-semibold uppercase tracking-wider">Region</span>
+            <span id="card-region" class="text-gray-300 font-semibold mt-0.5">Global</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-gray-500 text-[10px] font-semibold uppercase tracking-wider">Host</span>
+            <span id="card-host" class="text-mono text-gray-400 font-medium mt-0.5">181.191.141.7</span>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="bg-[#13151a] border-t border-[#1f232b] p-4 flex flex-col space-y-3">
-    <div id="category-container" class="flex items-center space-x-3 overflow-x-auto pb-1 custom-scrollbar">
+  <footer class="bg-[#111317] border-t border-[#1b1e24] p-4 flex flex-col space-y-3">
+    <div id="cat-list" class="flex items-center space-x-2.5 overflow-x-auto pb-1 custom-scroll">
       </div>
 
-    <div class="flex justify-end space-x-3 pt-1 border-t border-[#1f232b]/50">
-      <button class="flex items-center space-x-1.5 bg-[#1a1d24] hover:bg-[#232833] text-gray-300 px-4 py-2 rounded text-xs font-semibold border border-[#2d333f] transition">
+    <div class="flex justify-end space-x-2 pt-1.5 border-t border-[#1b1e24]/40">
+      <button class="flex items-center space-x-1.5 bg-[#171a21] hover:bg-[#1f242e] text-gray-400 hover:text-white px-3.5 py-1.5 rounded text-[11px] font-medium border border-[#232730] transition">
         <i data-lucide="compass" class="w-3.5 h-3.5"></i>
         <span>Browse</span>
       </button>
-      <button class="flex items-center space-x-1.5 bg-[#1a1d24] hover:bg-[#232833] text-gray-300 px-4 py-2 rounded text-xs font-semibold border border-[#2d333f] transition">
+      <button class="flex items-center space-x-1.5 bg-[#171a21] hover:bg-[#1f242e] text-gray-400 hover:text-white px-3.5 py-1.5 rounded text-[11px] font-medium border border-[#232730] transition">
         <i data-lucide="grid" class="w-3.5 h-3.5"></i>
         <span>Guide</span>
       </button>
@@ -131,55 +152,157 @@
   </footer>
 
   <script>
-    // ডামি ডাটা সেট
+    // অল চ্যানেল ডাটাবেস
     const channels = [
-      { id: '1', name: 'ESPN LAT', group: 'Sports', region: 'Global', host: '181.191.141.7', url: 'https://demo.m3u8/espn', quality: '720P', logoText: 'EL' },
-      { id: '2', name: 'DAZN 1 Main', group: 'DAZN', region: 'Europe', host: '192.168.1.50', url: 'https://demo.m3u8/dazn', quality: '1080P', logoText: 'DZ' },
-      { id: '3', name: 'Fox Sports 1', group: 'Sports', region: 'USA', host: '45.12.32.10', url: 'https://demo.m3u8/fox', quality: '720P', logoText: 'FS' }
+      { id: '1', name: 'ESPN LAT', group: 'ESPN', region: 'Global', host: '181.191.141.7', quality: '720P', logoText: 'EL', title: 'EE.UU. COMENZÓ CON EL PIE DERECHO EL MUNDIAL' },
+      { id: '2', name: 'DAZN 1 Main', group: 'DAZN', region: 'Europe', host: '192.168.1.50', quality: '1080P', logoText: 'DZ', title: 'LIVE: UEFA CHAMPIONS LEAGUE' },
+      { id: '3', name: 'Fox Sports 1', group: 'Sports', region: 'USA', host: '45.12.32.10', quality: '720P', logoText: 'FS', title: 'MLS: L.A. GALAXY VS INTER MIAMI' },
+      { id: '4', name: 'Sky Sports PL', group: 'Sports', region: 'UK', host: '88.41.22.19', quality: '1080P', logoText: 'SS', title: 'PREMIER LEAGUE LIVE' }
     ];
 
-    const categories = [
-      { name: 'Favorites', count: 8 },
-      { name: 'Sports', count: 61 },
-      { name: 'Latino', count: 30 },
-      { name: 'Live Sports', count: 25 },
-      { name: 'DAZN', count: 12 },
-      { name: 'USA', count: 54 }
-    ];
+    let favorites = []; // ফেভারিট চ্যানেল স্টোর করার জন্য
+    let currentChannel = channels[0];
 
-    let activeCategory = 'Sports';
-
-    // ১. রিয়েল টাইম ঘড়ি আপডেট
-    function updateClock() {
+    // ১. রিয়েল টাইম ডিজিটাল ঘড়ি
+    function runLiveClock() {
       const now = new Date();
-      document.getElementById('live-time').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      document.getElementById('live-time').innerText = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', minute: '2-digit', hour12: true 
+      });
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(runLiveClock, 1000);
+    runLiveClock();
 
-    // ২. ক্যাটাগরি বাটন রেন্ডার করা
-    const categoryContainer = document.getElementById('category-container');
-    categories.forEach(cat => {
-      const button = document.createElement('button');
-      button.className = `px-4 py-2 rounded-md font-medium text-xs whitespace-nowrap transition-all duration-200 ${
-        activeCategory === cat.name
-          ? 'bg-[#39FF14] text-black font-bold shadow-[0_0_10px_rgba(57,255,20,0.3)]'
-          : 'bg-[#1a1d24] text-gray-400 hover:bg-[#232833] hover:text-white'
-      }`;
-      button.innerHTML = `${cat.name} <span class="ml-1 text-[10px] ${activeCategory === cat.name ? 'text-black/70' : 'text-gray-500'}">${cat.count}</span>`;
-      categoryContainer.appendChild(button);
+    // 🟢 ২. রিয়েল লাইভ ভিজিটর ওঠানামা করার লজিক (রিয়েল লাইভ ফিল)
+    let visitorCount = 142;
+    function updateLiveVisitors() {
+      // ভিজিটর সংখ্যা র্যান্ডমলি কমবে বা বাড়বে (-৩ থেকে +৫ এর মধ্যে)
+      const change = Math.floor(Math.random() * 9) - 3; 
+      visitorCount += change;
+      if(visitorCount < 80) visitorCount = 110; // সেফটি লিমিট
+      document.getElementById('live-visitors').innerText = visitorCount;
+    }
+    setInterval(updateLiveVisitors, 3500); // প্রতি ৩.৫ সেকেন্ডে অটো চেঞ্জ হবে
+
+    // ⭐️ ৩. ক্যাটাগরি প্যানেল এবং ফেভারিট কাউন্টার আপডেট করা
+    const categories = [
+      { name: 'Favorites', count: 0, key: 'fav' },
+      { name: 'Sports', count: 61, key: 'sports' },
+      { name: 'Latino', count: 30, key: 'latino' },
+      { name: 'DAZN', count: 12, key: 'dazn' },
+      { name: 'USA', count: 54, key: 'usa' }
+    ];
+
+    function renderCategories() {
+      const catListContainer = document.getElementById('cat-list');
+      catListContainer.innerHTML = '';
+      
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        const isFav = cat.name === 'Favorites';
+        const displayCount = isFav ? favorites.length : cat.count;
+        
+        btn.className = `px-3 py-1.5 rounded text-[11px] font-bold whitespace-nowrap transition-all duration-150 bg-[#171a21] text-gray-400 hover:bg-[#1f242e] border border-[#232730]`;
+        if(cat.name === 'Sports') {
+          btn.className = `px-3 py-1.5 rounded text-[11px] font-bold whitespace-nowrap transition-all duration-150 bg-[#39FF14] text-black shadow-[0_0_12px_rgba(57,255,20,0.25)]`;
+        }
+        
+        btn.innerHTML = `${cat.name} <span class="ml-1 text-[10px] font-medium text-gray-600">${displayCount}</span>`;
+        
+        // ফেভারিট ক্যাটাগরিতে ক্লিক করলে ফেভারিট চ্যানেলগুলো শো করার ট্রিপল অ্যাকশন
+        if(isFav) {
+          btn.addEventListener('click', () => {
+            showSearchResults(favorites, "Your Favorites");
+          });
+        }
+        catListContainer.appendChild(btn);
+      });
+    }
+    renderCategories();
+
+    // ❤️ ৪. ফেভারিট (Heart Button) হ্যান্ডলিং লজিক
+    const favBtn = document.getElementById('fav-btn');
+    const favIcon = document.getElementById('fav-icon');
+
+    favBtn.addEventListener('click', () => {
+      const index = favorites.findIndex(c => c.id === currentChannel.id);
+      if (index === -1) {
+        favorites.push(currentChannel); // ফেভারিটে যোগ করুন
+        favIcon.classList.add('fill-red-500', 'text-red-500');
+      } else {
+        favorites.splice(index, 1); // ফেভারিট থেকে বাদ দিন
+        favIcon.classList.remove('fill-red-500', 'text-red-500');
+      }
+      renderCategories(); // বটম ফেভারিট কাউন্ট আপডেট করুন
     });
 
-    // ৩. প্লে/পজ বাটনের কাস্টম অ্যাকশন
-    let isPlaying = true;
-    const playPauseBtn = document.getElementById('play-pause-btn');
-    playPauseBtn.addEventListener('click', () => {
-      isPlaying = !isPlaying;
-      playPauseBtn.innerHTML = isPlaying ? '<i data-lucide="pause" class="w-8 h-8"></i>' : '<i data-lucide="play" class="w-8 h-8"></i>';
-      lucide.createIcons(); // আইকন রিলোড করার জন্য
+    // 🔍 ৫. রিয়েল-টাইম সার্চ লজিক
+    const searchInput = document.getElementById('search-input');
+    const overlay = document.getElementById('channel-list-overlay');
+    const resultsGrid = document.getElementById('search-results-grid');
+
+    searchInput.addEventListener('input', (e) => {
+      const value = e.target.value.toLowerCase().trim();
+      if(value === '') {
+        overlay.classList.add('hidden');
+        return;
+      }
+      // নাম অথবা গ্রুপ দিয়ে চ্যানেল ফিল্টার
+      const filtered = channels.filter(c => c.name.toLowerCase().includes(value) || c.group.toLowerCase().includes(value));
+      showSearchResults(filtered, `Search Results for "${value}"`);
     });
 
-    // Lucide Icons ইনিশিয়ালাইজ করা
+    function showSearchResults(channelList, headingText) {
+      overlay.classList.remove('hidden');
+      resultsGrid.innerHTML = '';
+      
+      if(channelList.length === 0) {
+        resultsGrid.innerHTML = `<p class="text-xs text-gray-500 col-span-3">No channels found.</p>`;
+        return;
+      }
+
+      channelList.forEach(ch => {
+        const item = document.createElement('div');
+        item.className = `bg-[#13151a] border border-[#1b1e24] p-3 rounded-lg flex items-center space-x-3 cursor-pointer hover:border-[#39FF14] transition`;
+        item.innerHTML = `
+          <div class="w-8 h-8 bg-[#163a1a] text-[#39FF14] border border-[#39FF14]/30 rounded flex items-center justify-center font-black text-xs">${ch.logoText}</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">${ch.name}</h4>
+            <p class="text-[10px] text-gray-500">${ch.group} • ${ch.region}</p>
+          </div>
+        `;
+        item.addEventListener('click', () => {
+          selectChannel(ch);
+          overlay.classList.add('hidden');
+          searchInput.value = '';
+        });
+        resultsGrid.appendChild(item);
+      });
+    }
+
+    // 📺 ৬. চ্যানেল সিলেক্ট বা সুইচ করার মূল ফাংশন
+    function selectChannel(ch) {
+      currentChannel = ch;
+      // UI ইনফরমেশন পরিবর্তন
+      document.getElementById('player-channel-name').innerText = ch.name;
+      document.getElementById('player-channel-meta').innerText = `Channel 003 • ${ch.group} • ${ch.quality}`;
+      document.getElementById('video-display-title').innerText = ch.title;
+      document.getElementById('video-display-host').innerText = `Host Source: ${ch.host}`;
+      document.getElementById('card-logo').innerText = ch.logoText;
+      document.getElementById('card-title').innerText = ch.name;
+      document.getElementById('card-group').innerText = ch.group;
+      document.getElementById('card-region').innerText = ch.region;
+      document.getElementById('card-host').innerText = ch.host;
+
+      // ফেভারিট হার্ট আইকন স্ট্যাটাস চেক
+      if(favorites.some(c => c.id === ch.id)) {
+        favIcon.classList.add('fill-red-500', 'text-red-500');
+      } else {
+        favIcon.classList.remove('fill-red-500', 'text-red-500');
+      }
+    }
+
+    // Lucide আইকন রেন্ডারিং
     lucide.createIcons();
   </script>
 </body>
