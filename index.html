@@ -18,10 +18,19 @@
     </header>
 
     <div id="channel-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <p class="col-span-full text-center text-xl animate-pulse text-gray-400">Loading ........</p>
+        <p class="col-span-full text-center text-xl animate-pulse text-gray-400">চ্যানেল লিস্ট লোড হচ্ছে...</p>
     </div>
 
     <script>
+        // ====================================================================
+        // 🚨 ১. যখন কোনো লাইভ খেলা থাকবে, তখন নিচের "no" কেটে "yes" করে দেবেন 🚨
+        // ====================================================================
+        const IS_LIVE_MATCH_ON = "Yes"; 
+
+        // 🚨 ২. এখানে আপনার কপি করা টোটালস্পোর্টস বা লাইভ ম্যাচের লিংকটি বসাবেন 🚨
+        const LIVE_MATCH_URL = "https://buffstream.soccer/"; 
+
+
         // রিয়েল-টাইম ভিজিটর কাউন্টার
         async function updateVisitorCount() {
             try {
@@ -29,22 +38,19 @@
                 const data = await res.json();
                 document.getElementById('visitor-count').innerText = data.value;
             } catch (err) {
-                document.getElementById('visitor-count').innerText = Math.floor(Math.random() * 5) + 3; // ব্যাকআপ রিয়েল নাম্বার
+                document.getElementById('visitor-count').innerText = Math.floor(Math.random() * 5) + 4;
             }
         }
         setInterval(updateVisitorCount, 4000);
         updateVisitorCount();
 
-        // স্ক্রিনশটের মতো ব্যাকগ্রাউন্ড কালার লিস্ট (উইলো, অরেঞ্জ, গ্রিন, ব্লু)
+        // গোল আইকনের কালার লিস্ট
         const colors = [
-            "bg-[#ef4444]", // Red/Win
-            "bg-[#f97316]", // Orange/Win Sports
-            "bg-[#14b8a6]", // Teal/Win Sports HD
-            "bg-[#06b6d4]", // Cyan/Win+
-            "bg-[#22c55e]", // Green/DSports
-            "bg-[#3b82f6]"  // Blue/Directv
+            "bg-[#ef4444]", "bg-[#f97316]", "bg-[#14b8a6]", 
+            "bg-[#06b6d4]", "bg-[#22c55e]", "bg-[#3b82f6]"
         ];
 
+        // M3U ফাইল থেকে আপনার বর্তমান চ্যানেলগুলো পড়া
         async function loadChannels() {
             try {
                 const response = await fetch('playlist.m3u');
@@ -83,19 +89,18 @@
 
                 channels.forEach((channel, index) => {
                     const randomColor = colors[index % colors.length];
-                    // নামের প্রথম ২ অক্ষর (যেমন: Win Sports এর জন্য WI)
                     const initials = channel.name.substring(0, 2).toLowerCase();
                     const flagUrl = `https://flagcdn.com/w40/${channel.country}.png`;
 
-                    // হুবহু স্ক্রিনশটের মতো ডার্ক কার্ড ফরম্যাট
+                    // লজিক: লাইভ ম্যাচ চালু থাকলে সব বাটনে খেলা ওপেন হবে, না থাকলে M3U এর নরমাল লিংক ওপেন হবে
+                    const finalPlayUrl = (IS_LIVE_MATCH_ON === "yes") ? LIVE_MATCH_URL : channel.url;
+
                     const card = `
                         <div class="bg-[#1a1a1e] border border-gray-950 rounded-xl p-4 flex items-center justify-between hover:bg-[#222226] transition-all duration-200 relative group">
-                            
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-12 rounded-full ${randomColor} flex items-center justify-center font-bold text-sm text-black uppercase shadow-md">
                                     ${initials}
                                 </div>
-                                
                                 <div class="max-w-[140px]">
                                     <h3 class="font-bold text-sm text-gray-200 truncate">${channel.name}</h3>
                                     <div class="flex items-center gap-2 mt-0.5">
@@ -104,13 +109,11 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="flex items-center gap-3">
                                 <button class="text-gray-600 hover:text-yellow-500 transition-colors text-xs">
                                     <i class="fa-regular fa-star"></i>
                                 </button>
-                                
-                                <button onclick="window.open('${channel.url}', '_blank')" class="w-7 h-7 rounded-full bg-[#121214] flex items-center justify-center border border-gray-800 hover:border-green-500 hover:bg-green-500 text-green-400 hover:text-black transition-all cursor-pointer">
+                                <button onclick="window.open('${finalPlayUrl}', '_blank')" class="w-7 h-7 rounded-full bg-[#121214] flex items-center justify-center border border-gray-800 hover:border-green-500 hover:bg-green-500 text-green-400 hover:text-black transition-all cursor-pointer">
                                     <i class="fa-solid fa-play text-[10px] ml-0.5"></i>
                                 </button>
                             </div>
@@ -120,7 +123,7 @@
                 });
 
             } catch (error) {
-                container.innerHTML = `<p class="col-span-full text-center text-red-500">playlist.m3u ফাইলটি লোড করা যাচ্ছে না।</p>`;
+                document.getElementById('channel-container').innerHTML = `<p class="col-span-full text-center text-red-500">playlist.m3u ফাইলটি লোড করা যাচ্ছে না।</p>`;
             }
         }
 
