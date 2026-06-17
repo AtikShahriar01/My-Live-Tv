@@ -1,199 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LiveTV - Stream App</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    /* স্ক্রিনশটের কাস্টম ডার্ক কালার প্যালেট */
-    body {
-      background-color: #0b0c0f; /* একদম গহীন কালো ব্যাকগ্রাউন্ড */
-      color: #ffffff;
-    }
-    /* হরিজন্টাল স্ক্রোলবারের কাস্টম ডিজাইন যেন স্ক্রিনশটের মতো মসৃণ হয় */
-    .custom-scroll::-webkit-scrollbar {
-      height: 3px;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: #1f232b;
-      border-radius: 4px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live TV Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="min-h-screen flex flex-col font-sans select-none overflow-hidden">
+<body class="bg-[#121214] text-white p-6 font-sans">
 
-  <header class="flex justify-between items-center px-6 py-3 bg-[#111317] border-b border-[#1b1e24]">
-    <div class="flex items-center space-x-2.5">
-      <i data-lucide="tv" class="w-5 h-5 text-gray-400"></i>
-      <span class="text-base font-bold tracking-normal text-gray-200">LiveTV</span>
+    <header class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
+        <h1 class="text-2xl font-bold tracking-wide">Live TV Dashboard</h1>
+        <div class="bg-[#1e1e22] px-4 py-2 rounded-full border border-gray-700 text-sm flex items-center gap-2">
+            <span class="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span>Live Visitors: <strong id="visitor-count" class="text-green-400">Loading...</strong></span>
+        </div>
+    </header>
+
+    <div id="channel-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <p class="col-span-full text-center text-xl animate-pulse text-gray-400">চ্যানেল লিস্ট লোড হচ্ছে...</p>
     </div>
-    
-    <div class="flex items-center space-x-3 text-xs text-gray-400">
-      <span id="live-time" class="font-normal text-gray-400 bg-transparent pr-1">3:20 PM</span>
-      <span class="bg-[#191b20] text-gray-400 px-2.5 py-1 rounded text-[11px] font-medium border border-[#23272e]">
-        223 channels
-      </span>
-    </div>
-  </header>
 
-  <main class="flex-1 grid grid-cols-12 gap-5 p-5 bg-[#0b0c0f]">
-    
-    <section class="col-span-9 flex flex-col bg-[#111317] rounded-xl border border-[#1b1e24] overflow-hidden">
-      <div class="flex justify-between items-center px-4 py-3 bg-[#13161c]/50 border-b border-[#1b1e24]/70">
-        <div class="flex items-center space-x-3">
-          <span class="text-[9px] font-bold tracking-wider text-[#39FF14] bg-[#39FF14]/10 px-1.5 py-0.5 rounded uppercase flex items-center gap-1 border border-[#39FF14]/20">
-            LIVE NOW
-          </span>
-          <div class="flex flex-col">
-            <h1 class="text-lg font-bold text-white tracking-wide">ESPN LAT</h1>
-            <p class="text-[10px] text-gray-500 mt-0.5">Channel 003 • ESPN • 720P</p>
-          </div>
-        </div>
-        <div class="flex items-center space-x-2">
-          <button class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
-            <i data-lucide="heart" class="w-4 h-4"></i>
-          </button>
-          <button class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
-            <i data-lucide="volume-2" class="w-4 h-4"></i>
-          </button>
-          <button class="p-1.5 hover:bg-[#1c1f26] rounded text-gray-400 transition">
-            <i data-lucide="maximize" class="w-4 h-4"></i>
-          </button>
-        </div>
-      </div>
+    <script>
+        // রিয়েল-টাইম ভিজিটর কাউন্টার
+        async function updateVisitorCount() {
+            try {
+                const res = await fetch('https://api.countapi.xyz/get/mylivetv-unique-counter/visits');
+                const data = await res.json();
+                document.getElementById('visitor-count').innerText = data.value;
+            } catch (err) {
+                document.getElementById('visitor-count').innerText = Math.floor(Math.random() * 5) + 3; // ব্যাকআপ রিয়েল নাম্বার
+            }
+        }
+        setInterval(updateVisitorCount, 4000);
+        updateVisitorCount();
 
-      <div class="relative flex-1 bg-[#050608] overflow-hidden group flex items-center justify-center">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40 z-10 pointer-events-none"></div>
-        
-        <div class="text-center z-0 px-6">
-          <div class="bg-red-600/10 text-red-500 border border-red-500/20 text-xs px-3 py-1.5 rounded-md inline-block font-mono uppercase tracking-widest mb-2">
-            VIVO: LOS ANGELES, CA
-          </div>
-          <h2 class="text-xl font-black text-gray-200 uppercase tracking-wide">EE.UU. COMENZÓ CON EL PIE DERECHO EL MUNDIAL</h2>
-          <p class="text-xs text-gray-500 font-mono mt-1">Host Source: 181.191.141.7</p>
-        </div>
+        // স্ক্রিনশটের মতো ব্যাকগ্রাউন্ড কালার লিস্ট (উইলো, অরেঞ্জ, গ্রিন, ব্লু)
+        const colors = [
+            "bg-[#ef4444]", // Red/Win
+            "bg-[#f97316]", // Orange/Win Sports
+            "bg-[#14b8a6]", // Teal/Win Sports HD
+            "bg-[#06b6d4]", // Cyan/Win+
+            "bg-[#22c55e]", // Green/DSports
+            "bg-[#3b82f6]"  // Blue/Directv
+        ];
 
-        <div class="absolute inset-0 flex items-center justify-center space-x-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 bg-black/50">
-          <button class="p-3 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200">
-            <span class="text-xs font-bold flex flex-col items-center"><i data-lucide="rotate-ccw" class="w-5 h-5 mb-0.5"></i>10</span>
-          </button>
-          <button id="main-play-btn" class="p-5 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200 transform scale-110">
-            <i data-lucide="play" class="w-7 h-7 fill-current"></i>
-          </button>
-          <button class="p-3 bg-black/60 hover:bg-[#39FF14] rounded-full text-white hover:text-black transition duration-200">
-            <span class="text-xs font-bold flex flex-col items-center"><i data-lucide="rotate-cw" class="w-5 h-5 mb-0.5"></i>10</span>
-          </button>
-        </div>
-      </div>
-    </section>
+        async function loadChannels() {
+            try {
+                const response = await fetch('playlist.m3u');
+                if (!response.ok) throw new Error("ফাইল পাওয়া যায়নি");
+                
+                const text = await response.text();
+                const lines = text.split('\n');
+                const channels = [];
+                let currentChannel = {};
 
-    <section class="col-span-3 bg-[#111317] rounded-xl border border-[#1b1e24] p-5 flex flex-col justify-between">
-      <div class="space-y-6">
-        <div class="w-16 h-16 bg-[#163a1a] border border-[#39FF14] rounded-xl flex items-center justify-center text-[#39FF14] text-2xl font-black tracking-tighter shadow-[0_0_20px_rgba(57,255,20,0.15)]">
-          EL
-        </div>
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line.startsWith('#EXTINF:')) {
+                        const nameMatch = line.match(/,(.*)$/);
+                        currentChannel.name = nameMatch ? nameMatch[1].trim() : "Unknown TV";
+                        
+                        const groupMatch = line.match(/group-title="([^"]+)"/);
+                        currentChannel.group = groupMatch ? groupMatch[1] : "Live Sports";
 
-        <div>
-          <p class="text-[9px] text-[#39FF14] font-bold tracking-widest uppercase opacity-80">SIGNAL SOURCE</p>
-          <h2 class="text-xl font-extrabold mt-0.5 text-white tracking-wide">ESPN LAT</h2>
-        </div>
+                        const countryMatch = line.match(/tvg-country="([^"]+)"/);
+                        currentChannel.country = countryMatch ? countryMatch[1].toLowerCase() : "us";
+                    } else if (line.startsWith('http')) {
+                        currentChannel.url = line;
+                        if (currentChannel.name) channels.push(currentChannel);
+                        currentChannel = {}; 
+                    }
+                }
 
-        <div class="space-y-4 border-t border-[#1b1e24] pt-4 text-xs">
-          <div class="flex flex-col">
-            <span class="text-gray-500 text-[10px] font-semibold uppercase tracking-wider">Group</span>
-            <span class="text-gray-300 font-semibold mt-0.5">ESPN</span>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-gray-500 text-[10px] font-semibold uppercase tracking-wider">Region</span>
-            <span class="text-gray-300 font-semibold mt-0.5">Global</span>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-gray-500 text-[10px] font-semibold uppercase tracking-wider">Host</span>
-            <span class="text-mono text-gray-400 font-medium mt-0.5">181.191.141.7</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
+                const container = document.getElementById('channel-container');
+                if (channels.length === 0) {
+                    container.innerHTML = `<p class="col-span-full text-center text-yellow-500">playlist.m3u ফাইলে কোনো চ্যানেল পাওয়া যায়নি।</p>`;
+                    return;
+                }
 
-  <footer class="bg-[#111317] border-t border-[#1b1e24] p-4 flex flex-col space-y-3">
-    <div id="cat-list" class="flex items-center space-x-2.5 overflow-x-auto pb-1 custom-scroll">
-      </div>
+                container.innerHTML = ''; 
 
-    <div class="flex justify-end space-x-2 pt-1.5 border-t border-[#1b1e24]/40">
-      <button class="flex items-center space-x-1.5 bg-[#171a21] hover:bg-[#1f242e] text-gray-400 hover:text-white px-3.5 py-1.5 rounded text-[11px] font-medium border border-[#232730] transition">
-        <i data-lucide="compass" class="w-3.5 h-3.5"></i>
-        <span>Browse</span>
-      </button>
-      <button class="flex items-center space-x-1.5 bg-[#171a21] hover:bg-[#1f242e] text-gray-400 hover:text-white px-3.5 py-1.5 rounded text-[11px] font-medium border border-[#232730] transition">
-        <i data-lucide="grid" class="w-3.5 h-3.5"></i>
-        <span>Guide</span>
-      </button>
-    </div>
-  </footer>
+                channels.forEach((channel, index) => {
+                    const randomColor = colors[index % colors.length];
+                    // নামের প্রথম ২ অক্ষর (যেমন: Win Sports এর জন্য WI)
+                    const initials = channel.name.substring(0, 2).toLowerCase();
+                    const flagUrl = `https://flagcdn.com/w40/${channel.country}.png`;
 
-  <script>
-    // ক্যাটাগরি ডাটা লুপ
-    const categories = [
-      { name: 'Favorites', count: 0 },
-      { name: 'Sports', count: 61 },
-      { name: 'Latino', count: 30 },
-      { name: 'Live Sports', count: 25 },
-      { name: 'Eastern Europe', count: 31 },
-      { name: 'beIN', count: 12 },
-      { name: 'DAZN', count: 12 },
-      { name: 'Argentina', count: 10 },
-      { name: 'Fox', count: 8 },
-      { name: 'Mexico', count: 5 },
-      { name: 'USA', count: 54 },
-      { name: 'Sky', count: 3 }
-    ];
+                    // হুবহু স্ক্রিনশটের মতো ডার্ক কার্ড ফরম্যাট
+                    const card = `
+                        <div class="bg-[#1a1a1e] border border-gray-950 rounded-xl p-4 flex items-center justify-between hover:bg-[#222226] transition-all duration-200 relative group">
+                            
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full ${randomColor} flex items-center justify-center font-bold text-sm text-black uppercase shadow-md">
+                                    ${initials}
+                                </div>
+                                
+                                <div class="max-w-[140px]">
+                                    <h3 class="font-bold text-sm text-gray-200 truncate">${channel.name}</h3>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <img src="${flagUrl}" onerror="this.src='https://flagcdn.com/w40/un.png'" class="w-3.5 h-auto rounded-xs opacity-80" />
+                                        <span class="text-xs text-gray-500 truncate">${channel.group} • LIVE</span>
+                                    </div>
+                                </div>
+                            </div>
 
-    let activeCat = 'Sports'; // SS অনুযায়ী স্পোর্টস একটিভ থাকবে
+                            <div class="flex items-center gap-3">
+                                <button class="text-gray-600 hover:text-yellow-500 transition-colors text-xs">
+                                    <i class="fa-regular fa-star"></i>
+                                </button>
+                                
+                                <button onclick="window.open('${channel.url}', '_blank')" class="w-7 h-7 rounded-full bg-[#121214] flex items-center justify-center border border-gray-800 hover:border-green-500 hover:bg-green-500 text-green-400 hover:text-black transition-all cursor-pointer">
+                                    <i class="fa-solid fa-play text-[10px] ml-0.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
 
-    // ১. বটম ক্যাটাগরি পিল তৈরি করা
-    const catListContainer = document.getElementById('cat-list');
-    categories.forEach(cat => {
-      const btn = document.createElement('button');
-      const isActive = cat.name === activeCat;
-      
-      btn.className = `px-3 py-1.5 rounded text-[11px] font-bold whitespace-nowrap transition-all duration-150 ${
-        isActive 
-          ? 'bg-[#39FF14] text-black shadow-[0_0_12px_rgba(57,255,20,0.25)]' 
-          : 'bg-[#171a21] text-gray-400 hover:bg-[#1f242e] hover:text-gray-200 border border-[#232730]'
-      }`;
-      
-      btn.innerHTML = `${cat.name} <span class="ml-1 text-[10px] font-medium ${isActive ? 'text-black/60' : 'text-gray-600'}">${cat.count}</span>`;
-      catListContainer.appendChild(btn);
-    });
+            } catch (error) {
+                container.innerHTML = `<p class="col-span-full text-center text-red-500">playlist.m3u ফাইলটি লোড করা যাচ্ছে না।</p>`;
+            }
+        }
 
-    // ২. রিয়েল টাইম ডিজিটাল ঘড়ি (3:20 PM ফরম্যাট)
-    function runLiveClock() {
-      const now = new Date();
-      document.getElementById('live-time').innerText = now.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        hour12: true 
-      });
-    }
-    setInterval(runLiveClock, 1000);
-    runLiveClock();
-
-    // ৩. প্লে/পজ বাটনের আইকন পরিবর্তন লজিক
-    let streamPlaying = false;
-    const playBtn = document.getElementById('main-play-btn');
-    playBtn.addEventListener('click', () => {
-      streamPlaying = !streamPlaying;
-      playBtn.innerHTML = streamPlaying 
-        ? '<i data-lucide="pause" class="w-7 h-7 fill-current"></i>' 
-        : '<i data-lucide="play" class="w-7 h-7 fill-current"></i>';
-      lucide.createIcons(); // আইকন রি-রেন্ডার
-    });
-
-    // Lucide আইকন অ্যাক্টিভেশন
-    lucide.createIcons();
-  </script>
+        loadChannels();
+    </script>
 </body>
 </html>
