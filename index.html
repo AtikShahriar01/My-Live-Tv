@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live TV Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script async src="https://api.countapi.xyz/hit/mylivetv-unique-counter/visits?callback=cb"></script>
 </head>
 <body class="bg-[#121214] text-white p-6 font-sans">
 
@@ -12,7 +13,7 @@
         <h1 class="text-2xl font-bold tracking-wide">Live TV Dashboard</h1>
         <div class="bg-[#1e1e22] px-4 py-2 rounded-full border border-gray-700 text-sm flex items-center gap-2">
             <span class="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
-            <span>Live Visitors: <strong id="visitor-count" class="text-green-400">Loading...</strong></span>
+            <span>Total Site Visits: <strong id="visitor-count" class="text-green-400">Loading...</strong></span>
         </div>
     </header>
 
@@ -21,34 +22,39 @@
     </div>
 
     <script>
-        // ১. লাইভ ভিজিটর কাউন্টার সেটআপ (সম্পূর্ণ ফ্রি এবং রেডিমেড)
-        async function getVisitors() {
+        // ১. রিয়েল-টাইম ভিজিটর কাউন্টার লজিক
+        async function updateVisitorCount() {
             try {
-                // একটি ডেমো এবং ফ্রি লাইভ কাউন্টার API
-                const res = await fetch('https://api.livecounts.io/v1/hits/ping', { method: 'POST' });
-                // আপনি চাইলে এখানে সরাসরি একটি র্যান্ডম লাইভ নাম্বারও দেখাতে পারেন (যেমন: ৫ থেকে ১৫ জন লাইভ)
-                document.getElementById('visitor-count').innerText = Math.floor(Math.random() * 10) + 5;
-            } catch {
-                document.getElementById('visitor-count').innerText = "12";
+                // কাউন্টার এপিআই থেকে অরিজিনাল ডাটা আনা
+                const res = await fetch('https://api.countapi.xyz/get/mylivetv-unique-counter/visits');
+                const data = await res.json();
+                document.getElementById('visitor-count').innerText = data.value;
+            } catch (err) {
+                // এপিআই সাময়িক ডাউন থাকলে ব্যাকআপ হিসেবে ১ জন দেখাবে (আপনি নিজে)
+                document.getElementById('visitor-count').innerText = "1";
             }
         }
-        setInterval(getVisitors, 5000); // প্রতি ৫ সেকেন্ড পর পর আপডেট হবে
-        getVisitors();
+        // প্রতি ৩ সেকেন্ড পর পর আসল ভিজিটর সংখ্যা চেক করবে
+        setInterval(updateVisitorCount, 3000);
+        updateVisitorCount();
 
-        // কালারফুল কার্ডের জন্য কিছু চমৎকার কালার লিস্ট
+        // কালারফুল কার্ড গ্রেডিয়েন্ট
         const gradients = [
             "from-orange-500 to-red-500", "from-green-500 to-teal-500",
             "from-blue-600 to-indigo-600", "from-emerald-500 to-green-600",
             "from-pink-500 to-rose-500", "from-purple-500 to-indigo-500"
         ];
 
-        // ২. M3U ফাইল থেকে চ্যানেল ডাটা পড়া এবং স্ক্রিনে দেখানো
+        // ২. M3U ফাইল থেকে চ্যানেল ডাটা পড়া
         async function loadChannels() {
             try {
                 const response = await fetch('playlist.m3u');
-                const text = await response.text();
                 
-                // M3U ফাইল লাইনের পর লাইন ভাগ করা
+                if (!response.ok) {
+                    throw new Error("ফাইল পাওয়া যায়নি");
+                }
+                
+                const text = await response.text();
                 const lines = text.split('\n');
                 const channels = [];
                 let currentChannel = {};
@@ -56,27 +62,36 @@
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (line.startsWith('#EXTINF:')) {
-                        // চ্যানেলের নাম বের করা
+                        // নাম আলাদা করা
                         const nameMatch = line.match(/,(.*)$/);
-                        currentChannel.name = nameMatch ? nameMatch[1] : "Unknown TV";
+                        currentChannel.name = nameMatch ? nameMatch[1].trim() : "Unknown TV";
                         
-                        // গ্রুপ বা ক্যাটাগরি বের করা
+                        // গ্রুপ বা ক্যাটাগরি
                         const groupMatch = line.match(/group-title="([^"]+)"/);
                         currentChannel.group = groupMatch ? groupMatch[1] : "Live Sports";
 
-                        // কান্ট্রি কোড বের করা (ফ্ল্যাগের জন্য)
+                        // কান্ট্রি কোড
                         const countryMatch = line.match(/tvg-country="([^"]+)"/);
                         currentChannel.country = countryMatch ? countryMatch[1].toLowerCase() : "us";
                     } else if (line.startsWith('http')) {
                         currentChannel.url = line;
-                        channels.push(currentChannel);
-                        currentChannel = {}; // নতুন চ্যানেলের জন্য খালি করা
+                        // শুধুমাত্র নাম ও ইউআরএল থাকা চ্যানেলগুলোই লিস্টে ঢুকবে
+                        if (currentChannel.name) {
+                            channels.push(currentChannel);
+                        }
+                        currentChannel = {}; 
                     }
                 }
 
-                // স্ক্রিনে কার্ডগুলো সুন্দর করে সাজানো
                 const container = document.getElementById('channel-container');
-                container.innerHTML = ''; // লোডিং টেক্সট মুছে ফেলা
+                
+                // যদি প্লেলিস্টে কোনো চ্যানেল না পায়
+                if (channels.length === 0) {
+                    container.innerHTML = `<p class="col-span-full text-center text-yellow-500">আপনার playlist.m3u ফাইলে কোনো সঠিক চ্যানেল লিংক খুঁজে পাওয়া যায়নি।</p>`;
+                    return;
+                }
+
+                container.innerHTML = ''; 
 
                 channels.forEach((channel, index) => {
                     const randomColor = gradients[index % gradients.length];
@@ -98,7 +113,7 @@
                                 </div>
                             </div>
                             <button class="w-8 h-8 rounded-full bg-[#24242a] flex items-center justify-center hover:bg-green-500 hover:text-black transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-green-400 hover:text-black">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-green-400">
                                     <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
                                 </svg>
                             </button>
@@ -108,7 +123,7 @@
                 });
 
             } catch (error) {
-                document.getElementById('channel-container').innerHTML = `<p class="col-span-full text-center text-red-500">প্লেলিস্ট লোড করতে সমস্যা হয়েছে।</p>`;
+                document.getElementById('channel-container').innerHTML = `<p class="col-span-full text-center text-red-500">playlist.m3u ফাইলটি পড়তে সমস্যা হচ্ছে। গিটহাবে ফাইলের নামটি ছোট হাতের অক্ষরে (playlist.m3u) আছে কিনা নিশ্চিত করুন।</p>`;
             }
         }
 
